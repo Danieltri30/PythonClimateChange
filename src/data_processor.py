@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from typing import Tuple
 
 class DataProcessor:
     def __init__(self, file_path: str):
@@ -23,11 +24,22 @@ class DataProcessor:
 
         return df
 
-    # TODO: Implement this
-    # def get_features_and_target(self) -> Tuple[np.ndarray, np.ndarray]:
-    #     """Split data into features (year, month) and target (temperature)"""
+    def get_features_and_target(self) -> Tuple[np.ndarray, np.ndarray]:
+        """Split data into features (month, day) and target (high, low)"""
+        df = self.clean_data()
+        df["month"] = pd.to_numeric(df["time"].astype(str).str.split("-").str[1])
+        df["day"] = pd.to_numeric(df["time"].astype(str).str.split("-").str[2])
+
+        features = df[["month", "day"]].to_numpy()
+        target = df[["temperature_2m_max", "temperature_2m_min"]].to_numpy()
+
+        return features, target
+
+
 
 if __name__ == "__main__":
-    df = DataProcessor("../data/Temperature.csv").clean_data()
-    print(df.head())
+    # features, target = DataProcessor("../data/Temperature.csv").get_features_and_target()
+    # for i, j in zip(features, target):
+    #     if i[0] == 1:
+    #         print(f"{i}\t{j}")
 
