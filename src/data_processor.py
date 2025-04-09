@@ -25,32 +25,40 @@ class DataProcessor:
         return df
 
     def get_features_and_target(self) -> Tuple[np.ndarray, np.ndarray]:
-        """Split data into features (month, day) and target (high, low)"""
+        """Split data into features (country, [city,] month, day) and target (average temperature)"""
         df = self.clean_data()
-        df["year"] = pd.to_numeric(df["dt"].astype(str).str.split("-").str[0])
-        df["month"] = pd.to_numeric(df["dt"].astype(str).str.split("-").str[1])
-        df["day"] = pd.to_numeric(df["dt"].astype(str).str.split("-").str[2])
+        if "ByCountry" in self.file_path or "ByMajorCity" in self.file_path:
+            df["year"] = pd.to_numeric(df["dt"].astype(str).str.split("-").str[0])
+            df["month"] = pd.to_numeric(df["dt"].astype(str).str.split("-").str[1])
+            df["day"] = pd.to_numeric(df["dt"].astype(str).str.split("-").str[2])
+            target = df["AverageTemperature"].to_numpy()
 
         if "ByCountry" in self.file_path:
             features = df[["Country", "year", "month", "day"]].to_numpy()
         elif "ByMajorCity" in self.file_path:
             features = df[["City", "Country", "year", "month", "day"]].to_numpy()
-        target = df["AverageTemperature"].to_numpy()
+        elif "Deviation" in self.file_path:
+            features = df["Year"].to_numpy()
+            target = df[["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "J-D"]].to_numpy()
 
         return features, target
 
 
 
 if __name__ == "__main__":
-    country_df = DataProcessor("../data/GlobalLandTemperaturesByCountry.csv").clean_data()
+    # country_df = DataProcessor("../data/GlobalLandTemperaturesByCountry.csv").clean_data()
     # print(country_df.head())
     # print(country_df.tail())
-    #
-    city_df = DataProcessor("../data/GlobalLandTemperaturesByMajorCity.csv").clean_data()
+
+    # city_df = DataProcessor("../data/GlobalLandTemperaturesByMajorCity.csv").clean_data()
     # print(city_df.head())
     # print(city_df.tail())
 
-    features, target = DataProcessor("../data/GlobalLandTemperaturesByMajorCity.csv").get_features_and_target()
+    # global_df = DataProcessor("../data/GlobalTemperatureDeviation.csv").clean_data()
+    # print(global_df.head())
+    # print(global_df.tail())
+
+    # features, target = DataProcessor("../data/GlobalLandTemperaturesByMajorCity.csv").get_features_and_target()
     # count = 0
     # for i, j in zip(features, target):
     #     count += 1
@@ -58,7 +66,7 @@ if __name__ == "__main__":
     #         break
     #     print(f"{i}\t{j}")
 
-    features, target = DataProcessor("../data/GlobalLandTemperaturesByCountry.csv").get_features_and_target()
+    # features, target = DataProcessor("../data/GlobalLandTemperaturesByCountry.csv").get_features_and_target()
     # count = 0
     # for i, j in zip(features, target):
     #     count += 1
@@ -66,5 +74,13 @@ if __name__ == "__main__":
     #         break
     #     print(f"{i}\t{j}")
 
+    # features, target = DataProcessor("../data/GlobalTemperatureDeviation.csv").get_features_and_target()
+    # count = 0
+    # for i, j in zip(features, target):
+    #     count += 1
+    #     if count == 10:
+    #         break
+    #     print(f"{i}\t{j}")
+    pass
 
 
