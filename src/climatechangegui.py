@@ -95,7 +95,7 @@ class ClimateChangeGUI:
             # Use unique city names from the city dataset
             options = sorted(self.df_city["City"].unique())
         elif mode == "global":
-            options = [col for col in self.df_global.columns if col != "Year" and col != "D-N" and col != "DJF" and col != "MAM" and col != "JJA" and col != "SON"]
+            options = [col for col in self.df_global.columns[1:14]]
 
         self.selection_dropdown['values'] = options
         if options:
