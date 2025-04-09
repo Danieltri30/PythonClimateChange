@@ -14,11 +14,11 @@ class DataProcessor:
     def clean_data(self) -> pd.DataFrame:
         """Remove rows with missing values and normalize temperature data"""
         df = self.load_data().dropna()
-        if "GlobalLandTemperaturesByCountry" in self.file_path:
+        if "ByCountry" in self.file_path:
             df["AverageTemperatureNormalized"] = (df["AverageTemperature"] - df.groupby("Country")["AverageTemperature"].transform("min")) / (df.groupby("Country")["AverageTemperature"].transform("max") - df.groupby("Country")["AverageTemperature"].transform("min"))
             # df["MinAvg"] = df.groupby("Country")["AverageTemperature"].transform("min")
             # df["MaxAvg"] = df.groupby("Country")["AverageTemperature"].transform("max")
-        elif "GlobalLandTemperaturesByMajorCity" in self.file_path:
+        elif "ByMajorCity" in self.file_path:
             df["AverageTemperatureNormalized"] = (df["AverageTemperature"] - df.groupby(["Country", "City"])["AverageTemperature"].transform("min")) / (df.groupby(["Country", "City"])["AverageTemperature"].transform("max") - df.groupby(["Country", "City"])["AverageTemperature"].transform("min"))
             # df["MinAvg"] = df.groupby(["Country", "City"])["AverageTemperature"].transform("min")
             # df["MaxAvg"] = df.groupby(["Country", "City"])["AverageTemperature"].transform("max")
@@ -31,9 +31,9 @@ class DataProcessor:
         df["month"] = pd.to_numeric(df["dt"].astype(str).str.split("-").str[1])
         df["day"] = pd.to_numeric(df["dt"].astype(str).str.split("-").str[2])
 
-        if "GlobalLandTemperaturesByCountry" in self.file_path:
+        if "ByCountry" in self.file_path:
             features = df[["Country", "year", "month", "day"]].to_numpy()
-        elif "GlobalLandTemperaturesByMajorCity" in self.file_path:
+        elif "ByMajorCity" in self.file_path:
             features = df[["City", "Country", "year", "month", "day"]].to_numpy()
         target = df["AverageTemperature"].to_numpy()
 
