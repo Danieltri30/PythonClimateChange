@@ -38,6 +38,7 @@ class DataProcessor:
 
 
 if __name__ == "__main__":
+    pass
     # features, target = DataProcessor("../data/Temperature.csv").get_features_and_target()
     # for i, j in zip(features, target):
     #     if i[0] == 1:
