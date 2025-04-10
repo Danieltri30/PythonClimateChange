@@ -1,20 +1,43 @@
-#import
+#pip install pandas
+#pip install matplotlib
+#pip install numpy
+#pip install seaborn
+#pip install scikit-learn
+#pip install cartopy
+#pip install keras
+#pip install keras-tuner
+#pip install tensorflow
 
-def build_model(hp):
-    model = Sequential()
-    model.add(LSTM(128, return_sequences=True, input_shape=(365, 1)))
-    model.add(LSTM(64, return_sequences=False))
-    model.add(Dense(25))
-    model.add(Dense(1))
-    model.compile(
-        optimizer='adam',
-        loss='mean_squared_error',
-        metrics=['mae', r2_metric]
-    )
-    return model
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np 
+import seaborn as sns
+import random
+import os
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+# Modeling tools
+from sklearn.model_selection import train_test_split, KFold
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.metrics import mean_absolute_error, r2_score
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, LSTM
+from tensorflow.keras.callbacks import LearningRateScheduler
+import tensorflow.keras.backend as K
+from tensorflow.keras.models import load_model
+import keras_tuner as kt
+import tensorflow as tf
 
-# NeuralNetwork Class
-class NeuralNetwork:
+
+
+class GeneralModeling:
+    def inverse_transform(self, temp_scaled_val: float, co2_scaled_val: float) -> tuple:
+        # Reshape to (1,1) , lets hope the model takes this shape
+        temp_orig = self.temp_scaler.inverse_transform([[temp_scaled_val]])[0][0]
+        co2_orig = self.co2_scaler.inverse_transform([[co2_scaled_val]])[0][0]
+        return temp_orig, co2_orig
+
+class Predictions(GeneralModeling):
     def __init__(self, X_train, X_test, y_train, y_test) -> None:
         self.X_train = X_train
         self.X_test = X_test
@@ -44,6 +67,9 @@ class NeuralNetwork:
         else:
             loss = result
             print(f"Loss: {loss}")
+
+class Clustering(GeneralModeling):
+
 
 # Main function
 def main():
