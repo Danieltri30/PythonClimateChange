@@ -33,10 +33,42 @@ Our Climate Change project
 # Installation & Dependencies
 
 ## Activate the environment
-#### (Placeholder - Will update when we get closer to turn-in time)
+#### (Placeholder - Work in progress)
+
+### Windows:
+```
+.venv\Scripts\activate
+```
+
+### Linux/MacOS:
 ```
 . .venv/bin/activate
 ```
+## Building Flask Application for Development:
+#### Step 1: Enter the src directory.
+```
+ cd src
+```
+
+#### Step 2:
+```
+flask --app main.py run
+```
+
+#### In your terminal you should see something like this:
+```
+(.venv) PS D:\Obsidian\PythonClimateChange\src> flask --app main.py run
+ * Serving Flask app 'main.py'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+```
+#### Step 3: Copy and Paste the into your preferred web browser the IP address that shows up in your terminal.
+```
+http://127.0.0.1:5000
+```
+#### If changes are made to the code, you should be able to refresh the web page to see the changes.
+## use ctrl+c to shut down the Flask Development Server.
 
 ---
 |             |    Random User-Guide Links         |               |
