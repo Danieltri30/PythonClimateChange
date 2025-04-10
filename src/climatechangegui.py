@@ -4,7 +4,7 @@ from matplotlib import text
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import pandas as pd
-from data_processor import DataProcessor
+from src.data_processor import DataProcessor
 
 class ClimateChangeGUI:
     def __init__(self, root):
