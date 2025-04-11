@@ -33,6 +33,67 @@ def build_model(hp):
     model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae', r2_metric]) 
     return model
 
+class GeneralTasks:
+    def run_prediction_model(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
+        X_train, X_test, y_train, y_test = p.load_and_prepare_data(csv_path)
+
+        tuner = kt.Hyperband(
+            build_model,
+            objective='val_mae',
+            max_epochs=1000,
+            directory='tuner_dense',
+            project_name='dense_model_test'
+        )
+
+        tuner.search(X_train, y_train, validation_data=(X_test, y_test), batch_size=32)
+
+        best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
+        print(f"Best Hyperparameters: {best_hps.values}")
+
+        nn = NeuralNetwork(X_train, X_test, y_train, y_test)
+        nn.d_model(hp=best_hps)
+        nn.train(epochs=1000)
+        nn.evaluate()
+    
+    def run_cluster_simulation(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "CleanedGlobalLandTemp.csv")
+        #Read in the dataset handled in data processor
+        cluster_df = pd.read_csv(csv_path)
+
+        #Call function from data processor to scale
+        datautil = p.FineTuneClusterData()
+        #WE will test with minmax scaling, and standard scaler
+        scaled_features = datautil.minmaxnormalize_cluster_data(cluster_df)
+        scaled_features_standard = datautil.standardnormalize_cluster_data(cluster_df)
+
+        cutil = Clustering()
+        #Get your K means function results
+        kmeans_var = cutil.kmeans1()
+        avg_city_df = cluster_df.copy()
+        avg_city_df2 = cluster_df.copy()
+        #Get prediction
+        avg_city_df['Cluster'] = kmeans_var.fit_predict(scaled_features)
+        avg_city_df2['Cluster'] = kmeans_var.fit_predict(scaled_features_standard)
+        plotplacer = viz.VisualizeData()
+        plotplacer.cluster_visualization(avg_city_df,"Min-Max")
+        plotplacer.cluster_visualization(avg_city_df2,"Standard")
+        #After various manual test we find out that k = 5 worked the best
+
+        #After testing both Min-Max scaling and Standard Scaling, we
+        #Found that standard scaling worked  the best 
+        # Now lets use a loop to figure out best k
+        klis = cutil.find_best_k(scaled_features) 
+        plotplacer.showelbow(klis)
+
+        
+
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalizedTrainedClusterData.csv")
+        avg_city_df.to_csv(csv_path,index = False)   
+
 class Clustering:
     #FOr testing multiple cluster values
     def kmeans1(self):
@@ -121,7 +182,8 @@ class NeuralNetwork:
 
     def train(self, epochs=50, batch_size=32):
         self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=epochs, batch_size=batch_size)
-        print("Model saved as 'best_model.h5'")
+        self.model.save("T.h5")
+        print("Model saved as 'T.h5'")
 
     def evaluate(self):
         loss, mae, r2 = self.model.evaluate(self.X_test, self.y_test)
@@ -132,65 +194,11 @@ class NeuralNetwork:
 def main():
     print("Please Choose from the following options:\n1.Train ONLY the prediction model\n2.Train ONLY the clustering model\n3.Train both models.")
     inp = int(input())
+    tool = GeneralTasks()
     if inp == 1:
-
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
-        X_train, X_test, y_train, y_test = p.load_and_prepare_data(csv_path)
-
-        tuner = kt.Hyperband(
-            build_model,
-            objective='val_mae',
-            max_epochs=1000,
-            directory='tuner_dense',
-            project_name='dense_model_test'
-        )
-
-        tuner.search(X_train, y_train, validation_data=(X_test, y_test), batch_size=32)
-
-        best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
-        print(f"Best Hyperparameters: {best_hps.values}")
-
-        nn = NeuralNetwork(X_train, X_test, y_train, y_test)
-        nn.d_model(hp=best_hps)
-        nn.train(epochs=1000)
-        nn.evaluate()
-    elif inp == 2:    
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        csv_path = os.path.join(script_dir, "..", "data", "CleanedGlobalLandTemp.csv")
-        #Read in the dataset handled in data processor
-        cluster_df = pd.read_csv(csv_path)
-
-        #Call function from data processor to scale
-        datautil = p.FineTuneClusterData()
-        #WE will test with minmax scaling, and standard scaler
-        scaled_features = datautil.minmaxnormalize_cluster_data(cluster_df)
-        scaled_features_standard = datautil.standardnormalize_cluster_data(cluster_df)
-
-        cutil = Clustering()
-        #Get your K means function results
-        kmeans_var = cutil.kmeans1()
-        avg_city_df = cluster_df.copy()
-        avg_city_df2 = cluster_df.copy()
-        #Get prediction
-        avg_city_df['Cluster'] = kmeans_var.fit_predict(scaled_features)
-        avg_city_df2['Cluster'] = kmeans_var.fit_predict(scaled_features_standard)
-        plotplacer = viz.VisualizeData()
-        plotplacer.cluster_visualization(avg_city_df,"Min-Max")
-        plotplacer.cluster_visualization(avg_city_df2,"Standard")
-        #After various manual test we find out that k = 5 worked the best
-
-        #After testing both Min-Max scaling and Standard Scaling, we
-        #Found that standard scaling worked  the best 
-        # Now lets use a loop to figure out best k
-        klis = cutil.find_best_k(scaled_features) 
-        plotplacer.showelbow(klis)
-
-        
-
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        csv_path = os.path.join(script_dir, "..", "data", "FinalizedTrainedClusterData.csv")
-        avg_city_df.to_csv(csv_path,index = False)
+        tool.run_prediction_model()   
+    elif inp == 2:
+        tool.run_cluster_simulation()
     elif inp == 3:
         x=2    
 
