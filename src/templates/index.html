@@ -1,10 +1,82 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
+{% block title %}Home - Climate Change Analysis{% endblock %}
 
-{% block head %}
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section text-center py-5 mb-5">
+    <h1 class="display-4 fw-bold">Climate Change Analysis</h1>
+    <p class="lead">Understanding global climate patterns and their impact on our planet</p>
+</div>
 
-{% endblock %}
+<!-- Data Cards Section -->
+<div class="row g-4">
+    <!-- Temperature Trends Card -->
+    <div class="col-md-6">
+        <div class="card h-100 shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-thermometer-half me-2"></i>Temperature Trends
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Analyze global temperature changes over time and their correlation with climate events.</p>
+                <div class="chart-container" style="height: 300px;">
+                    <!-- Chart will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-{% block body %}
-<h1>Template</h1>
+    <!-- CO2 Emissions Card -->
+    <div class="col-md-6">
+        <div class="card h-100 shadow">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-industry me-2"></i>CO2 Emissions
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Track carbon dioxide emissions and their impact on global warming.</p>
+                <div class="chart-container" style="height: 300px;">
+                    <!-- Chart will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sea Level Rise Card -->
+    <div class="col-md-6">
+        <div class="card h-100 shadow">
+            <div class="card-header bg-info text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-water me-2"></i>Sea Level Rise
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Monitor changes in sea levels and their implications for coastal regions.</p>
+                <div class="chart-container" style="height: 300px;">
+                    <!-- Chart will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Extreme Weather Events Card -->
+    <div class="col-md-6">
+        <div class="card h-100 shadow">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Extreme Weather Events
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">Analyze the frequency and intensity of extreme weather events worldwide.</p>
+                <div class="chart-container" style="height: 300px;">
+                    <!-- Chart will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
