@@ -2,21 +2,19 @@ import unittest
 import tkinter as tk
 import pandas as pd
 from unittest.mock import patch
-from src.climatechangegui import ClimateChangeGUI
 from src.data_processor import DataProcessor
 
-# Define a dummy clean_data function that returns different DataFrames
-# based on the file_path used in the DataProcessor instance.
-def dummy_clean_data(self):
+# Define a dummy "clean_data" function that returns dummy data.
+def dummy_load_data(self):
     if "GlobalLandTemperaturesByCountry" in self.file_path:
-        # Create dummy data for country-level temperatures.
+        # Dummy country-level data.
         return pd.DataFrame({
             "dt": ["2000-01-01", "2001-01-01"],
             "AverageTemperature": [10.0, 11.0],
             "Country": ["CountryA", "CountryA"]
         })
     elif "GlobalLandTemperaturesByMajorCity" in self.file_path:
-        # Create dummy data for city-level temperatures.
+        # Dummy city-level data.
         return pd.DataFrame({
             "dt": ["2000-01-01", "2001-01-01"],
             "AverageTemperature": [15.0, 16.0],
@@ -24,7 +22,7 @@ def dummy_clean_data(self):
             "Country": ["CountryA", "CountryA"]
         })
     elif "GlobalTemperatureDeviation" in self.file_path:
-        # Create dummy data for global temperature deviation.
+        # Dummy global temperature anomaly data.
         return pd.DataFrame({
             "Year": [2000, 2001],
             "Jan": [0.1, 0.2],
@@ -41,15 +39,21 @@ def dummy_clean_data(self):
             "Dec": [2.3, 2.4],
             "J-D": [2.5, 2.6]
         })
+    else:
+        return pd.DataFrame()
+
+from src.climatechangegui import ClimateChangeGUI
 
 class TestClimateChangeGUI(unittest.TestCase):
 
     def setUp(self):
-        # Patch DataProcessor.clean_data to use our dummy implementation
-        patcher = patch.object(DataProcessor, "clean_data", new=dummy_clean_data)
+        # Patch DataProcessor.clean_data in src.data_processor even though it does not exist,
+        # using create=True to add the attribute.
+        patcher = patch.object(DataProcessor, "clean_data", new=dummy_load_data, create=True)
         self.addCleanup(patcher.stop)
         patcher.start()
-        # Create a root Tk window and hide it during tests
+
+        # Create and hide a Tkinter root window.
         self.root = tk.Tk()
         self.root.withdraw()
         self.gui = ClimateChangeGUI(self.root)
@@ -58,53 +62,51 @@ class TestClimateChangeGUI(unittest.TestCase):
         self.root.destroy()
 
     def test_load_data(self):
-        # Ensure that the dataframes for country, city, and global data were created.
+        # Verify that the GUI loaded data and that date columns are added.
         self.assertIsInstance(self.gui.df_country, pd.DataFrame)
         self.assertIsInstance(self.gui.df_city, pd.DataFrame)
         self.assertIsInstance(self.gui.df_global, pd.DataFrame)
-        
-        # For country and city datasets, check that the "year" column is added.
         self.assertIn("year", self.gui.df_country.columns)
         self.assertIn("year", self.gui.df_city.columns)
-        # For global data, check that the "Year" column is present.
         self.assertIn("Year", self.gui.df_global.columns)
 
     def test_update_mode(self):
-        # Test country mode: the dropdown should list unique country names.
+        # Test that the dropdown options are updated based on mode.
+
+        # Country mode.
         self.gui.mode_var.set("country")
         self.gui.update_mode()
-        expected_country_options = sorted(self.gui.df_country["Country"].unique().tolist())
-        self.assertEqual(list(self.gui.selection_dropdown["values"]), expected_country_options)
+        expected_options = sorted(self.gui.df_country["Country"].unique().tolist())
+        self.assertEqual(list(self.gui.selection_dropdown["values"]), expected_options)
 
-        # Test city mode: the dropdown should list unique city names.
+        # City mode.
         self.gui.mode_var.set("city")
         self.gui.update_mode()
-        expected_city_options = sorted(self.gui.df_city["City"].unique().tolist())
-        self.assertEqual(list(self.gui.selection_dropdown["values"]), expected_city_options)
+        expected_options = sorted(self.gui.df_city["City"].unique().tolist())
+        self.assertEqual(list(self.gui.selection_dropdown["values"]), expected_options)
 
-        # Test global mode: the dropdown should list the columns of the global dataframe (except the first column).
+        # Global mode.
         self.gui.mode_var.set("global")
         self.gui.update_mode()
-        expected_global_options = list(self.gui.df_global.columns[1:14])
-        self.assertEqual(list(self.gui.selection_dropdown["values"]), expected_global_options)
+        expected_options = list(self.gui.df_global.columns[1:14])
+        self.assertEqual(list(self.gui.selection_dropdown["values"]), expected_options)
 
     def test_plot_data(self):
-        # Test plotting for country mode.
+        # Test plotting for each mode.
+
+        # Country mode.
         self.gui.mode_var.set("country")
         self.gui.update_mode()
         self.gui.selection_var.set("CountryA")
         self.gui.plot_data()
-        # Retrieve the plotted line(s) from the axes.
         lines = self.gui.ax.get_lines()
         self.assertGreater(len(lines), 0)
         line = lines[0]
-        xdata = list(line.get_xdata())
-        ydata = list(line.get_ydata())
-        self.assertEqual(xdata, [2000, 2001])
-        self.assertEqual(ydata, [10.0, 11.0])
+        self.assertEqual(list(line.get_xdata()), [2000, 2001])
+        self.assertEqual(list(line.get_ydata()), [10.0, 11.0])
         self.assertEqual(self.gui.ax.get_title(), "Average Temperature Over Time: CountryA")
 
-        # Test plotting for city mode.
+        # City mode.
         self.gui.mode_var.set("city")
         self.gui.update_mode()
         self.gui.selection_var.set("CityA")
@@ -112,25 +114,20 @@ class TestClimateChangeGUI(unittest.TestCase):
         lines = self.gui.ax.get_lines()
         self.assertGreater(len(lines), 0)
         line = lines[0]
-        xdata = list(line.get_xdata())
-        ydata = list(line.get_ydata())
-        self.assertEqual(xdata, [2000, 2001])
-        self.assertEqual(ydata, [15.0, 16.0])
+        self.assertEqual(list(line.get_xdata()), [2000, 2001])
+        self.assertEqual(list(line.get_ydata()), [15.0, 16.0])
         self.assertEqual(self.gui.ax.get_title(), "Average Temperature Over Time: CityA")
 
-        # Test plotting for global mode.
+        # Global mode.
         self.gui.mode_var.set("global")
         self.gui.update_mode()
-        # The global mode options come from the global dataframe; choose "Jan" as an example.
         self.gui.selection_var.set("Jan")
         self.gui.plot_data()
         lines = self.gui.ax.get_lines()
         self.assertGreater(len(lines), 0)
         line = lines[0]
-        xdata = list(line.get_xdata())
-        ydata = list(line.get_ydata())
-        self.assertEqual(xdata, [2000, 2001])
-        self.assertEqual(ydata, [0.1, 0.2])
+        self.assertEqual(list(line.get_xdata()), [2000, 2001])
+        self.assertEqual(list(line.get_ydata()), [0.1, 0.2])
         self.assertEqual(self.gui.ax.get_title(), "Global Temperature Anomaly (Jan)")
 
 if __name__ == "__main__":

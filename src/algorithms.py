@@ -15,7 +15,7 @@ from tensorflow.keras.layers import Dense
 import tensorflow.keras.backend as K
 import keras_tuner as kt
 from tensorflow.keras.layers import Dropout
-import data_processor as p
+import src.data_processor as p
 
 #Custom r^2 I used in a previous project 
 def r2_metric(y_true, y_pred):
