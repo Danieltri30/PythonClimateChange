@@ -69,7 +69,13 @@ class Predictions(GeneralModeling):
             print(f"Loss: {loss}")
 
 class Clustering(GeneralModeling):
+    def __init__(self):
+        super().__init__()
+        # Add any initialization code here
 
+    def cluster_data(self):
+        # Add clustering implementation here
+        pass
 
 # Main function
 def main():
