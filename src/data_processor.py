@@ -32,27 +32,71 @@ def average_monthly(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
         return grouped 
 
 class VisualizeData:
-    def average_by_decade(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
-        # Graph was having issues, lets display time in terms of Decades
-        df['decade'] = (df['time'].dt.year // 10) * 10
-        df['decade'] = pd.to_datetime(df['decade'], format='%Y')
-        grouped = df.groupby('decade')[value_col].mean().reset_index()
-        return grouped
-    
     def co2_over_time(self,df: pd.DataFrame):
-        plt.figure(figsize=(10, 6))
-        # Plot the CO2 levels over decades while still full co2
+        plt.figure(figsize=[10, 6])
+
+        subdf = df
+        new = set()
+        for val in subdf["time"]:
+            temp = val[:4]
+            new.add(temp)
+        for val in new:
+            print(val)
+
+        sset = sorted(new)        
+        # Plot CO2 levels over time (no changes to the CO2 data)
         plt.plot(df['time'], df['co2_ppm'], color='red', label='CO2 Levels (ppm)')
-        plt.title('CO2 Levels Over Time')
-        plt.xlabel('Time (Decades)')
-        plt.ylabel('CO2 Levels (ppm)')
-        xticks = pd.date_range(start=df['time'].min(), end=df['time'].max(), freq='10Y').to_pydatetime()
+        
+        min_year = 0
+        max_year = 2000
+        
+        xticks = range(min_year, max_year + 1, 1000)
+        
+        # Set the x-ticks on the plot with rotation
         plt.xticks(xticks, rotation=45)
+        
+        plt.title('CO2 Levels Over Time')
+        plt.xlabel('Time (Every 50 Years)')
+        plt.ylabel('CO2 Levels (ppm)')
+        
         plt.grid(True)
         plt.legend()
-        plt.gca().tick_params(axis='x', colors='blue')  # Customize x-axis tick labels
-        plt.tight_layout()
+        plt.tight_layout()  # To avoid clipping of labels
+        
         plt.show()
+
+    def temperature_levels_over_time(self,df:pd.DataFrame):
+        plt.figure(figsize=[10, 6])
+
+        subdf = df
+        new = set()
+        for val in subdf["time"]:
+            temp = val[:4]
+            new.add(temp)
+        for val in new:
+            print(val)
+
+        sset = sorted(new)        
+        # Plot CO2 levels over time (no changes to the CO2 data)
+        plt.plot(df['time'], df['temperature'], color='red', label='CO2 Levels (ppm)')
+        
+        min_year = 0
+        max_year = 2000
+        
+        xticks = range(min_year, max_year + 1, 1000)
+        
+        # Set the x-ticks on the plot with rotation
+        plt.xticks(xticks, rotation=45)
+        
+        plt.title('Temperature Deviations over time')
+        plt.xlabel('Time (Every 50 Years)')
+        plt.ylabel('CO2 Levels (ppm)')
+        
+        plt.grid(True)
+        plt.legend()
+        plt.tight_layout()  
+        
+        plt.show()                       
 
     def co2_vs_Temperature(self,df:pd.DataFrame):
         plt.figure(4)
@@ -241,7 +285,7 @@ def main():
         joblib.dump(processor.get_scalers()[0], "temp_scaler.pkl")
         joblib.dump(processor.get_scalers()[1], "co2_scaler.pkl")
         scaled_df.to_csv("Scaled_Data_For_Model.csv", index=False)
-    else:
+    elif holder == 2:
 
         final_df = pd.read_csv("data/FinalProcessedData.csv")
         dupes = final_df[final_df.duplicated()]
@@ -250,14 +294,18 @@ def main():
         #Final check for time duplicate
         time_dupes = final_df[final_df.duplicated(subset=["time"])]
         print("Duplicate timestamps:\n", time_dupes)
+    else:
+        final_df = pd.read_csv("data/FinalProcessedData.csv")
         plotplacer = VisualizeData()
-        plotplacer.co2_over_time(final_df)
+        plotplacer.co2_vs_Temperature(final_df)
         #From the graph we see a clear correlation between
         # the levels of CO2 and temperature deviation
         # It Seems that as temperature deviates in a warmer sense of things
         # CO2 emissions also equally rise, while a deviation towards global cooling
         # displays CO2 emissions being near the average level
-        plotplacer.co2_vs_Temperature(final_df)
+        plotplacer.co2_over_time(final_df)
+        plotplacer.temperature_levels_over_time(final_df)
+
 
     
 
