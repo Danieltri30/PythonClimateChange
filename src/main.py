@@ -1,11 +1,15 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, request, jsonify
+import os
 
 app = Flask(__name__)
 
 @app.route('/')
-def hello():
+def index():
     return render_template('index.html')
 
-if __name__ == "__main__":
-    app.run(debug=True)
+#@app.route('/about')
+#def about():
+    return render_template('about.html')
 
+if __name__ == '__main__':
+    app.run(debug=True) 
