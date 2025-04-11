@@ -4,6 +4,7 @@
 #pip install tensorflow
 
 
+import os
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -14,7 +15,7 @@ from tensorflow.keras.layers import Dense
 import tensorflow.keras.backend as K
 import keras_tuner as kt
 from tensorflow.keras.layers import Dropout
-import "algorithms.py"
+import data_processor as p
 
 #Custom r^2 I used in a previous project 
 def r2_metric(y_true, y_pred):
@@ -108,7 +109,9 @@ class NeuralNetwork:
 
 
 def main():
-    X_train, X_test, y_train, y_test = load_and_prepare_data("data/FinalProcessedData.csv")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
+    X_train, X_test, y_train, y_test = p.load_and_prepare_data(csv_path)
 
     tuner = kt.Hyperband(
         build_model,
