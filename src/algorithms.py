@@ -14,6 +14,7 @@ from tensorflow.keras.layers import Dense
 import tensorflow.keras.backend as K
 import keras_tuner as kt
 from tensorflow.keras.layers import Dropout
+import "algorithms.py"
 
 #Custom r^2 I used in a previous project 
 def r2_metric(y_true, y_pred):
@@ -29,23 +30,6 @@ def build_model(hp):
     model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae', r2_metric]) 
     return model
 
-# Used to Normalize complete dataset for our algorithm to better understand the values
-def load_and_prepare_data(filepath):
-    df = pd.read_csv(filepath)
-    df['time'] = pd.to_datetime(df['time'])
-    df['time_ordinal'] = (df['time'] - df['time'].min()).dt.days
-
-    scaler_time = MinMaxScaler()
-    scaler_temp = MinMaxScaler()
-    scaler_co2 = MinMaxScaler()
-
-    df['time_scaled'] = scaler_time.fit_transform(df[['time_ordinal']])
-    df['temperature_scaled'] = scaler_temp.fit_transform(df[['temperature']])
-    df['co2_scaled'] = scaler_co2.fit_transform(df[['co2_ppm']])
-
-    X = df[['time_scaled', 'co2_scaled']]
-    y = df['temperature_scaled']
-    return train_test_split(X, y, test_size=0.2, random_state=42)
 
 # An old model I used in a previous project, its on my github
 class NeuralNetwork:

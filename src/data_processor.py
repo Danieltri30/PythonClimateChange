@@ -14,6 +14,25 @@ from typing import Tuple
 import xarray as xr
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+from sklearn.model_selection import train_test_split, KFold
+
+# Used to Normalize complete dataset for our algorithm to better understand the values
+def load_and_prepare_data(filepath):
+    df = pd.read_csv(filepath)
+    df['time'] = pd.to_datetime(df['time'])
+    df['time_ordinal'] = (df['time'] - df['time'].min()).dt.days
+
+    scaler_time = MinMaxScaler()
+    scaler_temp = MinMaxScaler()
+    scaler_co2 = MinMaxScaler()
+
+    df['time_scaled'] = scaler_time.fit_transform(df[['time_ordinal']])
+    df['temperature_scaled'] = scaler_temp.fit_transform(df[['temperature']])
+    df['co2_scaled'] = scaler_co2.fit_transform(df[['co2_ppm']])
+
+    X = df[['time_scaled', 'co2_scaled']]
+    y = df['temperature_scaled']
+    return train_test_split(X, y, test_size=0.2, random_state=42)
 
 # FOr some reason the Berkley data was in fractional year format, so we use this to convert it to a format
 # that aligns with the CO2 dataset
@@ -262,10 +281,10 @@ def main():
 
         print(avg_temp.head())
         print(avg_co2.head())
-            # Commented it out to perserve the structure of our final dataset, but still shown to show process
-        #final_df = pd.merge(avg_temp, avg_co2, on="time", how="inner")
-        #print(final_df.head())
-        #final_df.to_csv("data/FinalProcessedData.csv",index = False)
+        #Commented it out to perserve the structure of our final dataset, but still shown to show process
+        final_df = pd.merge(avg_temp, avg_co2, on="time", how="inner")
+        print(final_df.head())
+        final_df.to_csv("data/FinalProcessedData.csv",index = False)
     elif holder == 1:
         final_df = pd.read_csv("data/FinalProcessedData.csv")
         #Lets make sure our data is not damaged in the process of setting it to dataframe
@@ -293,17 +312,7 @@ def main():
         time_dupes = final_df[final_df.duplicated(subset=["time"])]
         print("Duplicate timestamps:\n", time_dupes)
     elif holder == 3:
-        final_df = pd.read_csv("data/FinalProcessedData.csv")
-        plotplacer = VisualizeData()
-        plotplacer.co2_vs_Temperature(final_df)
-        #From the graph we see a clear correlation between
-        # the levels of CO2 and temperature deviation
-        # It Seems that as temperature deviates in a warmer sense of things
-        # CO2 emissions also equally rise, while a deviation towards global cooling
-        # displays CO2 emissions being near the average level
-        plotplacer.co2_over_time(final_df)
-        plotplacer.temperature_levels_over_time(final_df)
-    else:
+        #Time to get the data for our clustering algorithms (Kmeans probably)
         cdf = pd.read_csv("data/GlobalLandTemperature")    
 
 
