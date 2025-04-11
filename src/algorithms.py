@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.cluster import KMeans
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
@@ -109,27 +110,52 @@ class NeuralNetwork:
 
 
 def main():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
-    X_train, X_test, y_train, y_test = p.load_and_prepare_data(csv_path)
+    print("Please Choose from the following options:\n1.Train ONLY the prediction model\n2.Train ONLY the clustering model\n3.Train both models.")
+    inp = int(input())
+    if inp == 1:
 
-    tuner = kt.Hyperband(
-        build_model,
-        objective='val_mae',
-        max_epochs=1000,
-        directory='tuner_dense',
-        project_name='dense_model_test'
-    )
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
+        X_train, X_test, y_train, y_test = p.load_and_prepare_data(csv_path)
 
-    tuner.search(X_train, y_train, validation_data=(X_test, y_test), batch_size=32)
+        tuner = kt.Hyperband(
+            build_model,
+            objective='val_mae',
+            max_epochs=1000,
+            directory='tuner_dense',
+            project_name='dense_model_test'
+        )
 
-    best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
-    print(f"Best Hyperparameters: {best_hps.values}")
+        tuner.search(X_train, y_train, validation_data=(X_test, y_test), batch_size=32)
 
-    nn = NeuralNetwork(X_train, X_test, y_train, y_test)
-    nn.d_model(hp=best_hps)
-    nn.train(epochs=1000)
-    nn.evaluate()
+        best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
+        print(f"Best Hyperparameters: {best_hps.values}")
+
+        nn = NeuralNetwork(X_train, X_test, y_train, y_test)
+        nn.d_model(hp=best_hps)
+        nn.train(epochs=1000)
+        nn.evaluate()
+    elif inp == 2:    
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "CleanedGlobalLandTemp.csv")
+        #Read in the dataset handled in data processor
+        cluster_df = pd.read_csv(csv_path)
+
+        #Call function from data processor to scale
+        scaled_features = p.normalize_cluster_data(cluster_df)
+
+        #Get your K means function results
+        kmeans_var = KMeans(n_clusters = 4,random_state=42)
+        avg_city_df = cluster_df.copy()
+
+        #Get your prediction
+        avg_city_df['Cluster'] = kmeans_var.fit_predict(scaled_features)
+        
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalizedTrainedClusterData.csv")
+        avg_city_df.to_csv(csv_path,index = False)
+    elif inp == 3:
+        x=2    
 
 if __name__ == "__main__":
     main()

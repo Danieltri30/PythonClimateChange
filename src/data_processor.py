@@ -15,6 +15,8 @@ import xarray as xr
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from sklearn.model_selection import train_test_split, KFold
+import os
+import re
 
 # Used to Normalize complete dataset for our algorithm to better understand the values
 def load_and_prepare_data(filepath):
@@ -49,6 +51,12 @@ def average_monthly(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
         df["time"] = df["time"].dt.to_period("M").dt.to_timestamp()
         grouped = df.groupby("time")[value_col].mean().reset_index()
         return grouped 
+
+def normalize_cluster_data(df):
+    features = df[['AverageTemperature','Latitude','Longitude']]
+    scaler = MinMaxScaler()
+    scaled_features = scaler.fit_transform(features)
+    return scaled_features
    
 class FineTuneData:
     
@@ -169,12 +177,50 @@ class DataProcessor:
         print("Date range:", full_df["time"].min(), "to", full_df["time"].max())
         print("Unique time points:", full_df["time"].nunique())
         full_df.to_csv("Berkley_temperature_full.csv", index=False)
-    # Since daily tracking will be extremely hard, WE will average it to a month.   
+    # Since daily tracking will be extremely hard, WE will average it to a month.
+
+    def drop_nul(self,df):
+        df = df.dropna(subset=['AverageTemperature', 'AverageTemperatureUncertainty', 'Latitude', 'Longitude'])
+        return df 
+    
+
+    def clean_coordinates(self,df):
+        def fix_coord(coord):
+            coord = coord.strip()
+            if coord.endswith('N') or coord.endswith('E'):
+                coord = coord[:-1]  # remove letter
+            elif coord.endswith('S') or coord.endswith('W'):
+                coord = '-' + coord[:-1]  # prepend minus, remove letter
+            elif coord.endswith('-'):
+                coord = '-' + coord[:-1]  # fix trailing negative sign (e.g. '20.09-')
+            
+            # Remove anything that's not a digit, period, or minus
+            coord = re.sub(r'[^\d\.-]', '', coord)
+            return float(coord)
+
+        df['Latitude'] = df['Latitude'].apply(fix_coord)
+        df['Longitude'] = df['Longitude'].apply(fix_coord)
+
+        return df
+    
+
+    def dateformat(self,df):
+        df['dt']= pd.to_datetime(df['dt'])
+        return df
+    def cityaverage(self,df):
+        df_city_avg = df.groupby('City').agg({
+            'AverageTemperature': 'mean',
+            'AverageTemperatureUncertainty': 'mean',
+            'Latitude': 'first',
+            'Longitude': 'first',
+            'Country': 'first'  # to keep country info
+        }).reset_index()
+        return df_city_avg         
      
     
 
 def main():
-    holder = 100
+    holder = 3
     if holder == 0:
         #The functions below are extremly CPU Intensive, turn them on at your own risk
         '''
@@ -219,7 +265,9 @@ def main():
         print(final_df.head())
         final_df.to_csv("data/FinalProcessedData.csv",index = False)
     elif holder == 1:
-        final_df = pd.read_csv("data/FinalProcessedData.csv")
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
+        final_df = pd.read_csv(csv_path)
         #Lets make sure our data is not damaged in the process of setting it to dataframe
         print(final_df.head(10))
         print("End of head count 10")
@@ -236,8 +284,9 @@ def main():
         joblib.dump(processor.get_scalers()[1], "co2_scaler.pkl")
         scaled_df.to_csv("Scaled_Data_For_Model.csv", index=False)
     elif holder == 2:
-
-        final_df = pd.read_csv("data/FinalProcessedData.csv")
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
+        final_df = pd.read_csv(csv_path)
         dupes = final_df[final_df.duplicated()]
         #FInal check for general duplicates
         print("Exact Dulicate rows:\n",dupes)  
@@ -246,28 +295,39 @@ def main():
         print("Duplicate timestamps:\n", time_dupes)
     elif holder == 3:
         #Time to get the data for our clustering algorithms (Kmeans probably)
-        cdf = pd.read_csv("data/GlobalLandTemperature")    
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "GlobalLandTemperaturesByMajorCity.csv")
+        cdf = pd.read_csv(csv_path)
+        util = DataProcessor("random")
+        # Drop Empty datapoints
+        cdf_drop = util.drop_nul(cdf)
+
+        #Check to make sure all are dropped
+        print(cdf_drop.isnull().sum())
+
+        # Clean the cordinate values
+        clean_cdf = util.clean_coordinates(cdf_drop)
+
+        #Lets show a few coordinates to check
+        print(clean_cdf.head(10))
+
+        #LEts convert dt to datetime
+        converted_cdf = util.dateformat(clean_cdf)
+
+        #Again show to check
+        print(converted_cdf.head(10))
+
+        # Now we will group by city averages
+        avg_city_df = util.cityaverage(converted_cdf)
+
+        #Again show to check
+        print(avg_city_df.head(10))
+
+        #Looks all good , lets get this guy exported to a .csv
+        avg_city_df.to_csv("data/CleanedGlobalLandTemp.csv",index = False)
+
 
 
     
-
-    '''
-    berkleypath= "data/Berkley_temperature_full.csv"
-    co2csvpath = "data/co2_processed.csv"
-    # Create two dataprocessor utility instances
-    utilco2 = DataProcessor(co2csvpath)
-    utilberkley = DataProcessor(berkleypath)
-    # Load data into seperate dataframes using util
-    df_co2 = utilco2.load_data()
-    df_berk = utilberkley.load_data()
-    # comine both on time
-    fulldata = utilberkley.merge_data(df_berk,df_co2)
-    print("Merging has passed")
-    print(fulldata.head())
-    # Send near finalized data to a .csv
-    fulldata.to_csv("Final-co2-berk.csv",index = False)'''
-
-
-
 if __name__ == "__main__":
     main()
