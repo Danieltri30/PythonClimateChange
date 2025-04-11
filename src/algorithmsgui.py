@@ -89,6 +89,18 @@ class GeneralTasks:
         flat_preds = realpredictions.flatten()
         full_future_df['predicted_temperature'] = flat_preds
         return full_future_df , realpredictions
+    
+    def create_future_data_for_gui(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "Scaled_Future_Data.csv")
+        full_future_df,X_fut ,temp_scaler = p.load_and_prepare_future_data(csv_path)
+        model_path = os.path.join(script_dir, "..", "models", "The_Goat_Model.keras")
+        model = load_model(model_path, custom_objects={"r2_metric": r2_metric})
+        predictions=model.predict(X_fut)
+        realpredictions = temp_scaler.inverse_transform(predictions)
+        flat_preds = realpredictions.flatten()
+        full_future_df['predicted_temperature'] = flat_preds
+        return full_future_df , realpredictions
 
     def run_prediction_model(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))

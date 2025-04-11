@@ -3,70 +3,104 @@
 {% block title %}Home - Climate Change Analysis{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="text-center my-5">
-        <h1 class="display-4">Climate Change Analysis</h1>
-        <p class="lead">Select an analysis option to proceed</p>
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center mb-5">
+        <h1 class="display-4 mb-4" style="color: var(--secondary-color);">
+            <i class="fas fa-cloud-sun weather-icon"></i>
+            Climate Change Analysis
+        </h1>
+        <p class="lead" style="color: var(--text-muted);">
+            Explore climate data, train models, and predict future climate patterns
+        </p>
     </div>
+</div>
 
-    <div class="row g-4">
-        <!-- Option 1: Train Prediction Model -->
-        <div class="col-md-6">
-            <div class="card h-100 shadow">
-                <div class="card-body">
-                    <h2 class="card-title">1. Train Prediction Model</h2>
-                    <p class="card-text">Train the prediction model to forecast future climate patterns based on historical data.</p>
-                    <a href="/train-prediction" class="btn btn-primary">Start Training</a>
-                </div>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-chart-line weather-icon"></i>
+                    Train Prediction Model
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="card-text" style="color: var(--text-muted);">
+                    Train a neural network to predict future climate patterns based on historical data.
+                </p>
+                <a href="/train-prediction" class="btn btn-primary">
+                    <i class="fas fa-brain me-2"></i>Start Training
+                </a>
             </div>
         </div>
 
-        <!-- Option 2: Train Clustering Model -->
-        <div class="col-md-6">
-            <div class="card h-100 shadow">
-                <div class="card-body">
-                    <h2 class="card-title">2. Train Clustering Model</h2>
-                    <p class="card-text">Train and evaluate the clustering model to identify patterns in climate data.</p>
-                    <a href="/train-clustering" class="btn btn-primary">Start Training</a>
-                </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-project-diagram weather-icon"></i>
+                    Train Clustering Model
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="card-text" style="color: var(--text-muted);">
+                    Use clustering algorithms to identify patterns and groups in climate data.
+                </p>
+                <a href="/train-clustering" class="btn btn-primary">
+                    <i class="fas fa-sitemap me-2"></i>Start Clustering
+                </a>
             </div>
         </div>
 
-        <!-- Option 3: Gauge Best Model -->
-        <div class="col-md-6">
-            <div class="card h-100 shadow">
-                <div class="card-body">
-                    <h2 class="card-title">3. Gauge Best Model</h2>
-                    <p class="card-text">Evaluate and compare the performance of our trained models.</p>
-                    <a href="/gauge-model" class="btn btn-primary">Evaluate Models</a>
-                </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-balance-scale weather-icon"></i>
+                    Gauge Best Model
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="card-text" style="color: var(--text-muted);">
+                    Compare the performance of different models to determine the best approach.
+                </p>
+                <a href="/gauge-model" class="btn btn-primary">
+                    <i class="fas fa-trophy me-2"></i>Compare Models
+                </a>
             </div>
         </div>
 
-        <!-- Option 4: Predict Future -->
-        <div class="col-md-6">
-            <div class="card h-100 shadow">
-                <div class="card-body">
-                    <h2 class="card-title">4. Predict Future Climate</h2>
-                    <p class="card-text">Use our best model to predict future climate change scenarios.</p>
-                    <a href="/predict-future" class="btn btn-primary">Make Predictions</a>
-                </div>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-crystal-ball weather-icon"></i>
+                    Predict Future Climate
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="card-text" style="color: var(--text-muted);">
+                    Use the best model to make predictions about future climate conditions.
+                </p>
+                <a href="/predict-future" class="btn btn-primary">
+                    <i class="fas fa-magic me-2"></i>Make Predictions
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-chart-bar weather-icon"></i>
+                    Visualize Data
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="card-text" style="color: var(--text-muted);">
+                    Explore climate data through interactive visualizations and charts.
+                </p>
+                <a href="/visualize" class="btn btn-primary">
+                    <i class="fas fa-eye me-2"></i>View Visualizations
+                </a>
             </div>
         </div>
     </div>
 </div>
-
-<style>
-.card {
-    transition: transform 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-.btn {
-    margin-top: 1rem;
-}
-</style>
 {% endblock %}

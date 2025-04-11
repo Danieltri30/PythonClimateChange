@@ -114,7 +114,39 @@ class VisualizeData:
         plt.legend()
         plt.tight_layout()  
         
-        plt.show()                           
+        plt.show()     
+
+    def predicted_temperature_levels_over_time_for_gui(self,df:pd.DataFrame):
+        plt.figure(figsize=[10, 6])
+
+        subdf = df
+        new = set()
+        for val in subdf["time"]:
+            temp = val.year
+            new.add(temp)
+        sset = sorted(new)
+        subdf['year'] = subdf['time'].dt.year
+        plt.plot(subdf['year'], subdf['predicted_temperature'], color='red', label='Temperature Deviation Levels')
+
+        min_year = subdf["time"].min().year
+        max_year = subdf["time"].max().year
+        xticks = range(min_year, max_year + 1, 10)
+        plt.xticks(xticks, rotation=45)
+        plt.title('Temperature Deviations over time')
+        plt.xlabel('Time in 10 years')
+        plt.ylabel('Temperature')
+        plt.grid(True)
+        plt.legend()
+        plt.tight_layout()
+
+        buf = BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        
+        # Encode the image 
+        plot_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        plt.close() 
+        return plot_base64                         
 
     #Scatter plot to show correlation between temperature and CO2 Levels
     def co2_vs_Temperature(self,df:pd.DataFrame):

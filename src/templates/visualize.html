@@ -6,23 +6,11 @@
 <div class="container">
     <h1 class="text-center my-4">Climate Data Visualization</h1>
     
-    <!-- Combined Plot -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Temperature and CO2 Levels Over Time</h2>
-            <div class="plot-container">
-                {{ plots.combined | safe }}
-            </div>
-        </div>
-    </div>
-    
     <!-- Temperature Plot -->
     <div class="card shadow mb-4">
         <div class="card-body">
             <h2 class="card-title">Global Temperature Over Time</h2>
-            <div class="plot-container">
-                {{ plots.temperature | safe }}
-            </div>
+            <img src="data:image/png;base64,{{ plots.temperature }}" class="img-fluid" alt="Temperature Plot">
         </div>
     </div>
     
@@ -30,9 +18,7 @@
     <div class="card shadow mb-4">
         <div class="card-body">
             <h2 class="card-title">CO2 Levels Over Time</h2>
-            <div class="plot-container">
-                {{ plots.co2 | safe }}
-            </div>
+            <img src="data:image/png;base64,{{ plots.co2 }}" class="img-fluid" alt="CO2 Plot">
         </div>
     </div>
     
@@ -40,18 +26,8 @@
     <div class="card shadow mb-4">
         <div class="card-body">
             <h2 class="card-title">Correlation Heatmap</h2>
-            <div class="plot-container">
-                {{ plots.heatmap | safe }}
-            </div>
+            <img src="data:image/png;base64,{{ plots.heatmap }}" class="img-fluid" alt="Correlation Heatmap">
         </div>
     </div>
 </div>
-
-<style>
-.plot-container {
-    width: 100%;
-    height: 500px;
-    margin: 20px 0;
-}
-</style>
 {% endblock %} 
