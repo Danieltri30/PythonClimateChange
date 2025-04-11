@@ -16,14 +16,10 @@ from tensorflow.keras.layers import Dense
 import tensorflow.keras.backend as K
 import keras_tuner as kt
 from tensorflow.keras.layers import Dropout
-<<<<<<< HEAD
-import src.data_processor as p
-=======
 import data_processor as p
 import visualizer as viz
 import matplotlib.pyplot as plt
 
->>>>>>> 580d1053a0f5cffe3215e90e816fca4a414964bc
 
 #Custom r^2 I used in a previous project 
 def r2_metric(y_true, y_pred):
@@ -337,9 +333,6 @@ d1000(1)model:
 MAE : 0.0637
 R²  : 0.6327
 
-<<<<<<< HEAD
-'''    
-=======
 NewBestModel:
 MAE : 0.0637
 R²  : 0.6350
@@ -364,4 +357,3 @@ Raising Epoch seemed to help aswell.
 
 
 '''
->>>>>>> 580d1053a0f5cffe3215e90e816fca4a414964bc
