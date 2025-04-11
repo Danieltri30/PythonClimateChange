@@ -104,7 +104,13 @@ def main():
     plotplacer.co2_over_time(final_df)
 
     #THis will show temperature levels over time
-    plotplacer.temperature_levels_over_time(final_df)     
+    plotplacer.temperature_levels_over_time(final_df)
+
+
+
+    #NOW LETS Look at plots for the CLUSTERING PREDICTIONS
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(script_dir, "..", "data", "FinalizedTrain.csv")   
 
 if __name__ == '__main__':
     main()    
