@@ -52,7 +52,6 @@ class VisualizeData:
         
         xticks = range(min_year, max_year + 1, 1000)
         
-        # Set the x-ticks on the plot with rotation
         plt.xticks(xticks, rotation=45)
         
         plt.title('CO2 Levels Over Time')
@@ -85,7 +84,6 @@ class VisualizeData:
         
         xticks = range(min_year, max_year + 1, 1000)
         
-        # Set the x-ticks on the plot with rotation
         plt.xticks(xticks, rotation=45)
         
         plt.title('Temperature Deviations over time')
@@ -294,7 +292,7 @@ def main():
         #Final check for time duplicate
         time_dupes = final_df[final_df.duplicated(subset=["time"])]
         print("Duplicate timestamps:\n", time_dupes)
-    else:
+    elif holder == 3:
         final_df = pd.read_csv("data/FinalProcessedData.csv")
         plotplacer = VisualizeData()
         plotplacer.co2_vs_Temperature(final_df)
@@ -305,6 +303,8 @@ def main():
         # displays CO2 emissions being near the average level
         plotplacer.co2_over_time(final_df)
         plotplacer.temperature_levels_over_time(final_df)
+    else:
+        cdf = pd.read_csv("data/GlobalLandTemperature")    
 
 
     

@@ -1,3 +1,9 @@
+#pip install pandas
+#pip install numpy
+#pip install sklearn
+#pip install tensorflow
+
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -23,7 +29,7 @@ def build_model(hp):
     model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae', r2_metric]) 
     return model
 
-# Used to Normalize complete dataset for our algorithm
+# Used to Normalize complete dataset for our algorithm to better understand the values
 def load_and_prepare_data(filepath):
     df = pd.read_csv(filepath)
     df['time'] = pd.to_datetime(df['time'])
@@ -43,7 +49,8 @@ def load_and_prepare_data(filepath):
 
 # An old model I used in a previous project, its on my github
 class NeuralNetwork:
-    #Simple feed forward neural network using 
+    #Simple feed forward neural network using
+    # Dense neurons and a relu activation function at the end
     def __init__(self, X_train, X_test, y_train, y_test):
         self.X_train = X_train
         self.X_test = X_test
@@ -51,6 +58,7 @@ class NeuralNetwork:
         self.y_test = y_test
         self.model = None
     
+    #Below are just various implementations of the model I attempted to use
     def b_model(self, hp=None):
         self.model = Sequential()
         units = hp.Int('units', min_value=32, max_value=128, step=32) if hp else 64
@@ -107,7 +115,6 @@ class NeuralNetwork:
 
     def train(self, epochs=50, batch_size=32):
         self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=epochs, batch_size=batch_size)
-        self.model.save("bestd1000(1)_model.h5")
         print("Model saved as 'best_model.h5'")
 
     def evaluate(self):
