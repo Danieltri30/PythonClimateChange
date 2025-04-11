@@ -6,7 +6,7 @@
 
 import matplotlib
 import joblib
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import datetime
 import pandas as pd
 import numpy as np
@@ -52,11 +52,18 @@ def average_monthly(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
         grouped = df.groupby("time")[value_col].mean().reset_index()
         return grouped 
 
-def normalize_cluster_data(df):
-    features = df[['AverageTemperature','Latitude','Longitude']]
-    scaler = MinMaxScaler()
-    scaled_features = scaler.fit_transform(features)
-    return scaled_features
+class FineTuneClusterData:
+    def minmaxnormalize_cluster_data(self,df):
+        features = df[['AverageTemperature','Latitude','Longitude']]
+        scaler = MinMaxScaler()
+        scaled_features = scaler.fit_transform(features)
+        return scaled_features
+    
+    def standardnormalize_cluster_data(self,df):
+        features = df[['AverageTemperature','Latitude','Longitude']]
+        scaler = StandardScaler()
+        scaled_features = scaler.fit_transform(features)
+        return scaled_features
    
 class FineTuneData:
     
@@ -84,6 +91,7 @@ class FineTuneData:
         temp_orig = self.temp_scaler.inverse_transform([[temp_scaled_val]])[0][0]
         co2_orig = self.co2_scaler.inverse_transform([[co2_scaled_val]])[0][0]
         return temp_orig, co2_orig
+    
 
 
 

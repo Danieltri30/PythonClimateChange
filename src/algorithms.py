@@ -17,6 +17,7 @@ import tensorflow.keras.backend as K
 import keras_tuner as kt
 from tensorflow.keras.layers import Dropout
 import data_processor as p
+import visualizer as viz
 
 #Custom r^2 I used in a previous project 
 def r2_metric(y_true, y_pred):
@@ -31,6 +32,25 @@ def build_model(hp):
     model.add(Dense(1, activation='linear'))
     model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae', r2_metric]) 
     return model
+
+class Clustering:
+    #FOr testing multiple cluster values
+    def kmeans1(self):
+        return KMeans(n_clusters = 5,random_state=42)
+    def kmeans2(self):
+        return KMeans(n_clusters = 4,random_state=42)
+    def kmeans3(self):
+        return KMeans(n_clusters = 3,random_state=42)
+    def kmeans4(self):
+        return KMeans(n_clusters = 6,random_state=42)
+    
+    def find_best_k(self,sf):
+        klis = []
+        for k in range(1,11):
+            km = KMeans(n_clusters = k,random_state=42)
+            km.fit(sf)
+            klis.append(km.inertia_)
+        return klis    
 
 
 # An old model I used in a previous project, its on my github
@@ -142,15 +162,32 @@ def main():
         cluster_df = pd.read_csv(csv_path)
 
         #Call function from data processor to scale
-        scaled_features = p.normalize_cluster_data(cluster_df)
+        datautil = p.FineTuneClusterData()
+        #WE will test with minmax scaling, and standard scaler
+        scaled_features = datautil.minmaxnormalize_cluster_data(cluster_df)
+        scaled_features_standard = datautil.standardnormalize_cluster_data(cluster_df)
 
+        cutil = Clustering()
         #Get your K means function results
-        kmeans_var = KMeans(n_clusters = 4,random_state=42)
+        kmeans_var = cutil.kmeans1()
         avg_city_df = cluster_df.copy()
-
-        #Get your prediction
+        avg_city_df2 = cluster_df.copy()
+        #Get prediction
         avg_city_df['Cluster'] = kmeans_var.fit_predict(scaled_features)
+        avg_city_df2['Cluster'] = kmeans_var.fit_predict(scaled_features_standard)
+        plotplacer = viz.VisualizeData()
+        plotplacer.cluster_visualization(avg_city_df,"Min-Max")
+        plotplacer.cluster_visualization(avg_city_df2,"Standard")
+        #After various manual test we find out that k = 5 worked the best
+
+        #After testing both Min-Max scaling and Standard Scaling, we
+        #Found that standard scaling worked  the best 
+        # Now lets use a loop to figure out best k
+        klis = cutil.find_best_k(scaled_features) 
+        plotplacer.showelbow(klis)
+
         
+
         script_dir = os.path.dirname(os.path.abspath(__file__))
         csv_path = os.path.join(script_dir, "..", "data", "FinalizedTrainedClusterData.csv")
         avg_city_df.to_csv(csv_path,index = False)
