@@ -80,6 +80,15 @@ class GeneralTasks:
     def create_future_data(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         csv_path = os.path.join(script_dir, "..", "data", "Scaled_Future_Data.csv")
+        full_future_df,X_fut ,temp_scaler = p.load_and_prepare_future_data(csv_path)
+        model_path = os.path.join(script_dir, "..", "models", "The_Goat_Model.keras")
+        model = load_model(model_path, custom_objects={"r2_metric": r2_metric})
+        predictions=model.predict(X_fut)
+        realpredictions = temp_scaler.inverse_transform(predictions)
+        flat_preds = realpredictions.flatten()
+        full_future_df['predicted_temperature'] = flat_preds
+        return full_future_df , realpredictions
+
     def run_prediction_model(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
@@ -98,7 +107,7 @@ class GeneralTasks:
         print(f"Best Hyperparameters: {best_hps.values}")
 
         nn = NeuralNetwork(X_train, X_test, y_train, y_test)
-        nn(hp=best_hps)
+        nn.d_model(hp=best_hps)
         nn.train(epochs=1000)
         nn.evaluate()
 
@@ -259,15 +268,28 @@ class NeuralNetwork:
 
 
 def main():
-    print("Please Choose from the following options:\n1.Train ONLY the prediction model\n2.Train ONLY the clustering model\n3.Train both models\n4.")
+    print("Please Choose from the following options:\n1.Train ONLY the prediction model\n2.Train and gauge ONLY the clustering model\n3.Gauge our best model\n4.Predict future climate change with our best model")
     inp = int(input())
     tool = GeneralTasks()
+    vtool = viz.VisualizeData()
     if inp == 1:
         tool.run_prediction_model()   
     elif inp == 2:
         tool.run_cluster_simulation()
     elif inp == 3:
-        tool.Test_best_model()    
+        tool.Test_best_model()
+    elif inp == 4:
+        future_data_holder,predictions= tool.create_future_data()
+        print(future_data_holder[:5])
+        for val in future_data_holder.columns:
+            print(val)
+
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        futcsv_path = os.path.join(script_dir, "..", "data", "Full_Final_Predicted_Temperatures.csv")
+        future_data_holder.to_csv(futcsv_path,index = False)
+        vtool.predicted_temperature_levels_over_time(future_data_holder)
+            
+
 
 if __name__ == "__main__":
     main()

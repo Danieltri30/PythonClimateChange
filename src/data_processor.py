@@ -43,12 +43,18 @@ def load_and_prepare_future_data(filepath):
 
     scaler_time = MinMaxScaler()
     scaler_co2 = MinMaxScaler()
+    scaler_temp = MinMaxScaler()
 
     df['time_scaled'] = scaler_time.fit_transform(df[['time_ordinal']])
     df['co2_scaled'] = scaler_co2.fit_transform(df[['co2_ppm']])
 
     X_future = df[['time_scaled', 'co2_scaled']]
-    return X_future
+
+    historical_path = os.path.join(os.path.dirname(filepath), "FinalProcessedData.csv")
+    historical_df = pd.read_csv(historical_path)
+    scaler_temp.fit(historical_df[['temperature']])
+
+    return df,X_future, scaler_temp
 
 # FOr some reason the Berkley data was in fractional year format, so we use this to convert it to a format
 # that aligns with the CO2 dataset
