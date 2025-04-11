@@ -8,6 +8,13 @@ Our Climate Change project
 
 #### Python-based tool that analyzes and visualizes climate change data made for CIS4930.
 
+# PLEASE NOTE #
+# The uncleaned datasets we used for this project are extremly large , therefore please click #
+# the link below to access a cloud storage containing the .csv's which are uncleaned #
+# https://drive.google.com/drive/folders/19hV-AirPnow0ZuEnzPqcD6YdM63J0XjN?dmr=1&ec=wgc-drive-globalnav-goto # 
+# Please note a clean version of this data has been provided, if your Central Processing Unit is not up to date, #
+# then it is advised for you to simply used the cleaned data found in the data folder with the title :  #
+# FinalProcessedData.csv #
 
 ## climate_analyzer_project Structure 
 #### (Placeholder - Will update when we get closer to turn-in time)
