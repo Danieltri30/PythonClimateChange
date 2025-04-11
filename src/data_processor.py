@@ -94,7 +94,16 @@ class FineTuneData:
     
 
 
-
+class SyntheticDataProcessor:
+    def estimate_yearlyco2(self,df):
+        df["time"] = pd.to_datetime(df["time"])
+        df = df.sort_values("time")
+        
+        yearly_avg = df.groupby("year")["co2_ppm"].mean().reset_index()
+        yearly_avg["delta"] = yearly_avg["co2_ppm"].diff()
+        avg_increase = yearly_avg["delta"].dropna().mean()
+        print("Estimated average yearly CO₂ increase (ppm):", round(avg_increase, 2))
+        return avg_increase, yearly_avg
 class DataProcessor:
     #Intialize DataProcessor instance including file path to dataset
     def __init__(self, file_path: str):

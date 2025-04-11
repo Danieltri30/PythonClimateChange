@@ -106,37 +106,45 @@ class VisualizeData:
         plt.title('Elbow Method For Optimal k')
         plt.show()
 
+    def general_data_analysis(self,df):
+        print("START OF GENERAL DATA ANALYSIS:\n")
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
+        final_df = pd.read_csv(csv_path)
+        plotplacer = VisualizeData()
+        plotplacer.co2_vs_Temperature(final_df)
+        #From the graph we see a clear correlation between
+        # the levels of CO2 and temperature deviation
+
+
+        # It Seems that as temperature deviates in a warmer sense of things
+        # CO2 emissions also equally rise, while a deviation towards global cooling
+        # displays CO2 emissions being near the average level
+
+        plotplacer.co2_over_time(final_df)
+
+        #THis will show temperature levels over time
+        plotplacer.temperature_levels_over_time(final_df)
+        print("END OF GENERAL DATA ANALYSIS:\n")
+
+    def oldClustercode():
+        print("START OF CLUSTERED DATA ANALYSIS:\n")
+        #NOW LETS Look at plots for the CLUSTERING PREDICTIONS
+        #script_dir = os.path.dirname(os.path.abspath(__file__))
+        #csv_path = os.path.join(script_dir, "..", "data", "FinalizedTrainedClusterData.csv")
+        #city_df = pd.read_csv(csv_path)
+
+        #Run function to vizualze Data
+        #plotplacer.cluster_visualization(city_df)
+        print("END OF CLUSTERED DATA ANALYSIS:\n")    
+
+
 def main():
-    print("START OF GENERAL DATA ANALYSIS:\n")
     script_dir = os.path.dirname(os.path.abspath(__file__))
     csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
     final_df = pd.read_csv(csv_path)
     plotplacer = VisualizeData()
-    plotplacer.co2_vs_Temperature(final_df)
-    #From the graph we see a clear correlation between
-    # the levels of CO2 and temperature deviation
-
-
-    # It Seems that as temperature deviates in a warmer sense of things
-    # CO2 emissions also equally rise, while a deviation towards global cooling
-    # displays CO2 emissions being near the average level
-
-    plotplacer.co2_over_time(final_df)
-
-    #THis will show temperature levels over time
-    plotplacer.temperature_levels_over_time(final_df)
-    print("END OF GENERAL DATA ANALYSIS:\n")
-
-
-    print("START OF CLUSTERED DATA ANALYSIS:\n")
-    #NOW LETS Look at plots for the CLUSTERING PREDICTIONS
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_path = os.path.join(script_dir, "..", "data", "FinalizedTrainedClusterData.csv")
-    city_df = pd.read_csv(csv_path)
-
-    #Run function to vizualze Data
-    plotplacer.cluster_visualization(city_df)
-    print("END OF CLUSTERED DATA ANALYSIS:\n")
+    plotplacer.general_data_analysis(final_df)
 
 
 if __name__ == '__main__':
