@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Data Visualization - Climate Change Analysis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="text-center my-4">Climate Data Visualization</h1>
+    
+    <!-- Temperature Plot -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Global Temperature Over Time</h2>
+            <img src="data:image/png;base64,{{ plots.temperature }}" class="img-fluid" alt="Temperature Plot">
+        </div>
+    </div>
+    
+    <!-- CO2 Plot -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h2 class="card-title">CO2 Levels Over Time</h2>
+            <img src="data:image/png;base64,{{ plots.co2 }}" class="img-fluid" alt="CO2 Plot">
+        </div>
+    </div>
+    
+    <!-- Correlation Heatmap -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Correlation Heatmap</h2>
+            <img src="data:image/png;base64,{{ plots.heatmap }}" class="img-fluid" alt="Correlation Heatmap">
+        </div>
+    </div>
+</div>
+{% endblock %} 
