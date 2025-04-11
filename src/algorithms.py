@@ -91,7 +91,7 @@ class GeneralTasks:
         
 
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        csv_path = os.path.join(script_dir, "..", "data", "FinalizedTrainedClusterData.csv")
+        csv_path = os.path.join(script_dir, "..", "data", "BestTrainedClusterData.csv")
         avg_city_df.to_csv(csv_path,index = False)   
 
 class Clustering:
@@ -243,5 +243,9 @@ R²  : 0.6283
 d1000(1)model:
 MAE : 0.0637
 R²  : 0.6327
+
+NewBestModel:
+MAE : 0.0637
+R²  : 0.6350
 
 '''    

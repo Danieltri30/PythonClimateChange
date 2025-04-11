@@ -52,6 +52,40 @@ def average_monthly(df: pd.DataFrame, value_col: str) -> pd.DataFrame:
         grouped = df.groupby("time")[value_col].mean().reset_index()
         return grouped 
 
+class General:
+    def clean_and_process_cluster_data(self):
+        #Time to get the data for our clustering algorithms (Kmeans probably)
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "GlobalLandTemperaturesByMajorCity.csv")
+        cdf = pd.read_csv(csv_path)
+        util = DataProcessor("random")
+        # Drop Empty datapoints
+        cdf_drop = util.drop_nul(cdf)
+
+        #Check to make sure all are dropped
+        print(cdf_drop.isnull().sum())
+
+        # Clean the cordinate values
+        clean_cdf = util.clean_coordinates(cdf_drop)
+
+        #Lets show a few coordinates to check
+        print(clean_cdf.head(10))
+
+        #LEts convert dt to datetime
+        converted_cdf = util.dateformat(clean_cdf)
+
+        #Again show to check
+        print(converted_cdf.head(10))
+
+        # Now we will group by city averages
+        avg_city_df = util.cityaverage(converted_cdf)
+
+        #Again show to check
+        print(avg_city_df.head(10))
+
+        #Looks all good , lets get this guy exported to a .csv
+        avg_city_df.to_csv("data/CleanedGlobalLandTemp.csv",index = False)
+
 class FineTuneClusterData:
     def minmaxnormalize_cluster_data(self,df):
         features = df[['AverageTemperature','Latitude','Longitude']]
@@ -98,7 +132,7 @@ class SyntheticDataProcessor:
     def estimate_yearlyco2(self,df):
         df["time"] = pd.to_datetime(df["time"])
         df = df.sort_values("time")
-        
+
         yearly_avg = df.groupby("year")["co2_ppm"].mean().reset_index()
         yearly_avg["delta"] = yearly_avg["co2_ppm"].diff()
         avg_increase = yearly_avg["delta"].dropna().mean()
@@ -238,13 +272,9 @@ class DataProcessor:
 
 def main():
     holder = 3
+    masstool = General()
     if holder == 0:
-        #The functions below are extremly CPU Intensive, turn them on at your own risk
-        '''
-        while False:
-            util = DataProcessor("Land_and_Ocean_LatLong1.nc")
-            util.format_nc()
-        '''    
+        #The functions below are extremly CPU Intensive, turn them on at your own risk 
         #df = pd.read_csv("Berkley_temperature_full.csv", parse_dates=["time"])
         #print("Time range:", df["time"].min(), "to", df["time"].max())
         util = DataProcessor("random")
@@ -311,37 +341,7 @@ def main():
         time_dupes = final_df[final_df.duplicated(subset=["time"])]
         print("Duplicate timestamps:\n", time_dupes)
     elif holder == 3:
-        #Time to get the data for our clustering algorithms (Kmeans probably)
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        csv_path = os.path.join(script_dir, "..", "data", "GlobalLandTemperaturesByMajorCity.csv")
-        cdf = pd.read_csv(csv_path)
-        util = DataProcessor("random")
-        # Drop Empty datapoints
-        cdf_drop = util.drop_nul(cdf)
-
-        #Check to make sure all are dropped
-        print(cdf_drop.isnull().sum())
-
-        # Clean the cordinate values
-        clean_cdf = util.clean_coordinates(cdf_drop)
-
-        #Lets show a few coordinates to check
-        print(clean_cdf.head(10))
-
-        #LEts convert dt to datetime
-        converted_cdf = util.dateformat(clean_cdf)
-
-        #Again show to check
-        print(converted_cdf.head(10))
-
-        # Now we will group by city averages
-        avg_city_df = util.cityaverage(converted_cdf)
-
-        #Again show to check
-        print(avg_city_df.head(10))
-
-        #Looks all good , lets get this guy exported to a .csv
-        avg_city_df.to_csv("data/CleanedGlobalLandTemp.csv",index = False)
+        masstool.clean_and_process_cluster_data()
 
 
 

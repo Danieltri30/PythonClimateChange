@@ -18,6 +18,8 @@ from sklearn.model_selection import train_test_split, KFold
 import os
 
 class VisualizeData:
+    #Shows how CO2_ppm changes over itme
+    #Co2_ppm(Parts per Million) means how many molecules of carbon dioxide there are in every million molecules of air.
     def co2_over_time(self,df: pd.DataFrame):
         plt.figure(figsize=[10, 6])
 
@@ -40,7 +42,7 @@ class VisualizeData:
         
         plt.xticks(xticks, rotation=45)
         
-        plt.title('CO2 Levels Over Time')
+        plt.title('CO2 PPM Level Over Time')
         plt.xlabel('Time (Every 50 Years)')
         plt.ylabel('CO2 Levels (ppm)')
         
@@ -50,6 +52,8 @@ class VisualizeData:
         
         plt.show()
 
+    #Shows Temperature Deviation over time
+    #Temperature deviation refers to sudden alterations of temperature vs the average for a chosen period of time
     def temperature_levels_over_time(self,df:pd.DataFrame):
         plt.figure(figsize=[10, 6])
 
@@ -82,6 +86,7 @@ class VisualizeData:
         
         plt.show()                       
 
+    #Scatter plot to show correlation between temperature and CO2 Levels
     def co2_vs_Temperature(self,df:pd.DataFrame):
         plt.figure(4)
         plt.scatter(df['temperature'], df['co2_ppm'], alpha=0.5)
@@ -89,7 +94,9 @@ class VisualizeData:
         plt.xlabel('Temperature Deviation')
         plt.ylabel('CO2 Level (ppm)')
         plt.show()
-     
+
+    #Generalized function to show cluster visuals
+    #Robust and accepts various clustering algorithms
     def cluster_visualization(self,df,s):
         plt.figure(figsize=(10, 6))
         plt.scatter(df['Longitude'], df['Latitude'], c=df['Cluster'], cmap='viridis')
@@ -99,6 +106,7 @@ class VisualizeData:
         plt.colorbar(label='Cluster')
         plt.show()
 
+    #Proves that our choice of k was perfect mathematically
     def showelbow(self,klist):         
         plt.plot(range(1, 11), klist, marker='o')
         plt.xlabel('Number of Clusters')
@@ -106,6 +114,7 @@ class VisualizeData:
         plt.title('Elbow Method For Optimal k')
         plt.show()
 
+    #Functions to keep code clean
     def general_data_analysis(self,df):
         print("START OF GENERAL DATA ANALYSIS:\n")
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -128,6 +137,7 @@ class VisualizeData:
         print("END OF GENERAL DATA ANALYSIS:\n")
 
     def oldClustercode():
+        #Unused since we added a better version of this in algorithms
         print("START OF CLUSTERED DATA ANALYSIS:\n")
         #NOW LETS Look at plots for the CLUSTERING PREDICTIONS
         #script_dir = os.path.dirname(os.path.abspath(__file__))
