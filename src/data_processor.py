@@ -176,8 +176,12 @@ class DataProcessor:
 def main():
     holder = 100
     if holder == 0:
-        #util = DataProcessor("Land_and_Ocean_LatLong1.nc")
-        #util.format_nc()
+        #The functions below are extremly CPU Intensive, turn them on at your own risk
+        '''
+        while False:
+            util = DataProcessor("Land_and_Ocean_LatLong1.nc")
+            util.format_nc()
+        '''    
         #df = pd.read_csv("Berkley_temperature_full.csv", parse_dates=["time"])
         #print("Time range:", df["time"].min(), "to", df["time"].max())
         util = DataProcessor("random")
@@ -204,6 +208,7 @@ def main():
         print(df_co2.columns)
         print(df_berk.columns)
 
+        # Get averages for temp and co2
         avg_temp = average_monthly(df_berk, "temperature")
         avg_co2 = average_monthly(df_co2, "co2_ppm")
 
