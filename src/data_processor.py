@@ -36,6 +36,20 @@ def load_and_prepare_data(filepath):
     y = df['temperature_scaled']
     return train_test_split(X, y, test_size=0.2, random_state=42)
 
+def load_and_prepare_future_data(filepath):
+    df = pd.read_csv(filepath)
+    df['time'] = pd.to_datetime(df['time'])
+    df['time_ordinal'] = (df['time'] - df['time'].min()).dt.days
+
+    scaler_time = MinMaxScaler()
+    scaler_co2 = MinMaxScaler()
+
+    df['time_scaled'] = scaler_time.fit_transform(df[['time_ordinal']])
+    df['co2_scaled'] = scaler_co2.fit_transform(df[['co2_ppm']])
+
+    X_future = df[['time_scaled', 'co2_scaled']]
+    return X_future
+
 # FOr some reason the Berkley data was in fractional year format, so we use this to convert it to a format
 # that aligns with the CO2 dataset
 def convertyear(yf):
@@ -86,6 +100,50 @@ class General:
         #Looks all good , lets get this guy exported to a .csv
         avg_city_df.to_csv("data/CleanedGlobalLandTemp.csv",index = False)
 
+    def test_dataset_integrity(self,df):
+        print("Testing data...\n")
+        required_columns = ['time', 'co2_ppm']
+        for col in required_columns:
+            if col not in df.columns:
+                print(f"Missing the column: {col}")
+                return False
+
+    
+        if df[required_columns].isnull().values.any():
+            print("Missing values detected in one of the columns in the dataset.")
+            return False
+
+        
+        try:
+            df['time'] = pd.to_datetime(df['time'])
+        except Exception as e:
+            print(f"TIme vals not in proepr format: {e}")
+            return False
+
+        
+        if not df['time'].is_monotonic_increasing:
+            print("Your dataset is unordered in the time column")
+            return False
+        
+
+        if df.duplicated().any():
+            print(f"Duplicates detected: {df.duplicated().any()}")
+            return False
+        
+
+        if df.duplicated(subset='time').any():
+            print(f"Dataset contains :\n { df.duplicated(subset='time').any()} duplicate timestamps : ")
+            return False
+        
+
+        if (df['co2_ppm'] < 0).any():
+            print("Anomalies found in the co2 column")
+            return False
+        
+
+        print("Data ready for normalizaton.")
+        return True     
+
 class FineTuneClusterData:
     def minmaxnormalize_cluster_data(self,df):
         features = df[['AverageTemperature','Latitude','Longitude']]
@@ -116,6 +174,13 @@ class FineTuneData:
         # Store the result
         self.scaled_df = self.df
         return self.scaled_df
+    def scale_future_data(self) -> pd.DataFrame:
+        # Transform each piece of data independently
+        self.df['co2_scaled'] = self.co2_scaler.fit_transform(self.df[['co2_ppm']])
+        # Store the result
+        self.scaled_df = self.df
+        return self.scaled_df
+
     
     def get_scalers(self):
         return self.temp_scaler, self.co2_scaler
@@ -129,7 +194,7 @@ class FineTuneData:
 
 #This class will give synthetic data to our neural network so he can predict future climate
 class SyntheticDataProcessor:
-    def estimate_monthly_co2_trend(df):
+    def estimate_monthly_co2_trend(self,df):
         df["time"] = pd.to_datetime(df["time"])
         df = df.sort_values("time")
 
@@ -141,6 +206,23 @@ class SyntheticDataProcessor:
         print("Average monthly CO₂ increase (ppm):", round(avg_monthly_increase, 4))
 
         return avg_monthly_increase
+    
+    def simulate_data_for_giventime(self,df,mons):
+        #Grab last Time point and co2 instance from data
+        last_row = df.sort_values("time").iloc[-1]
+        last_date = pd.to_datetime(last_row["time"])
+        last_co2 = last_row["co2_ppm"]
+        co2_varition = self.estimate_monthly_co2_trend(df)
+        future_time_holder = [last_date + pd.DateOffset(months=i) for i in range(1, mons + 1)]
+        future_co2_holder = [last_co2 + i * co2_varition for i in range(1, mons + 1)]
+        future_df = pd.DataFrame({
+            "time": future_time_holder,
+            "co2_ppm": future_co2_holder
+        })
+        return future_df
+
+
+
 class DataProcessor:
     #Intialize DataProcessor instance including file path to dataset
     def __init__(self, file_path: str):
@@ -274,7 +356,7 @@ class DataProcessor:
     
 
 def main():
-    holder = 3
+    holder = 2
     masstool = General()
     if holder == 0:
         #The functions below are extremly CPU Intensive, turn them on at your own risk 
@@ -321,6 +403,12 @@ def main():
         #Lets make sure our data is not damaged in the process of setting it to dataframe
         print(final_df.head(10))
         print("End of head count 10")
+        dupes = final_df[final_df.duplicated()]
+        #FInal check for general duplicates
+        print("Exact Dulicate rows:\n",dupes)  
+        #Final check for time duplicate
+        time_dupes = final_df[final_df.duplicated(subset=["time"])]
+        print("Duplicate timestamps:\n", time_dupes)
         processor = FineTuneData(final_df)
         scaled_df = processor.scaledata()
         print(scaled_df.head())
@@ -337,14 +425,27 @@ def main():
         script_dir = os.path.dirname(os.path.abspath(__file__))
         csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
         final_df = pd.read_csv(csv_path)
-        dupes = final_df[final_df.duplicated()]
-        #FInal check for general duplicates
-        print("Exact Dulicate rows:\n",dupes)  
-        #Final check for time duplicate
-        time_dupes = final_df[final_df.duplicated(subset=["time"])]
-        print("Duplicate timestamps:\n", time_dupes)
+        synthtool = SyntheticDataProcessor()
+        #Change the second parameter passed into this function
+        # TO get a bigger synthetic dataset, the val passed is the amount of months
+        # to create data for 
+        future_df = synthtool.simulate_data_for_giventime(final_df,264)
+        masstool.test_dataset_integrity(future_df)
+        #Test looks good , lets pass to .csv
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        futurecsv_path = os.path.join(script_dir, "..", "data", "Cleared_Futuredata.csv")
+        future_df.to_csv(futurecsv_path,index = False)
+        processor = FineTuneData(future_df)
+        future_scaled_df = processor.scale_future_data()
+        print(future_scaled_df.head())
+        masstool.test_dataset_integrity(future_scaled_df)
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        scsv_path = os.path.join(script_dir, "..", "data", "Scaled_Future_Data.csv")
+        future_scaled_df.to_csv(scsv_path,index = False)
+
     elif holder == 3:
         masstool.clean_and_process_cluster_data()
+
 
 
 

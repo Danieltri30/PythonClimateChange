@@ -11,13 +11,15 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import KMeans
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential , load_model
 from tensorflow.keras.layers import Dense
 import tensorflow.keras.backend as K
 import keras_tuner as kt
 from tensorflow.keras.layers import Dropout
 import data_processor as p
 import visualizer as viz
+import matplotlib.pyplot as plt
+
 
 #Custom r^2 I used in a previous project 
 def r2_metric(y_true, y_pred):
@@ -28,12 +30,56 @@ def r2_metric(y_true, y_pred):
 # Build model based on fire ah hyperparameters
 def build_model(hp):
     model = Sequential()
-    model.add(Dense(units=hp.Int('units', min_value=32, max_value=128, step=32), activation='relu'))
+    model.add(Dense(units=hp.Int('units', min_value=32, max_value=512, step=32), activation='relu'))
     model.add(Dense(1, activation='linear'))
     model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae', r2_metric]) 
     return model
 
+def build_model2(hp):
+    model = Sequential()
+    
+    # Add first layer of dense nuerons which machine/tuner will already be inclined to use
+    model.add(Dense(
+        units=hp.Int('units1', min_value=64, max_value=512, step=64),
+        activation=hp.Choice('activation1', ['relu', 'tanh', 'elu'])
+    ))
+
+    # IF tuner finds that he can improve base performance prior to test he will use the layers below
+    if hp.Boolean('use_second_layer'):
+        model.add(Dense(
+            units=hp.Int('units2', min_value=64, max_value=256, step=64),
+            activation=hp.Choice('activation2', ['relu', 'tanh', 'elu'])
+        ))
+
+    
+    if hp.Boolean('use_third_layer'):
+        model.add(Dense(
+            units=hp.Int('units3', min_value=32, max_value=128, step=32),
+            activation=hp.Choice('activation3', ['relu', 'tanh', 'elu'])
+        ))
+
+    # Dropout for loss mitigation if tuner needs it 
+    if hp.Boolean('use_dropout'):
+        model.add(Dropout(rate=hp.Float('dropout_rate', min_value=0.1, max_value=0.5, step=0.1)))
+
+
+    model.add(Dense(1, activation='linear'))
+
+    # Learning rate so bro slows down as he gets to the end when he gets more precise
+    lr = hp.Float('learning_rate', min_value=1e-4, max_value=1e-2, sampling='log')
+
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=lr),
+        loss='mean_squared_error',
+        metrics=['mae', r2_metric]
+    )
+
+    return model
+
 class GeneralTasks:
+    def create_future_data(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "Scaled_Future_Data.csv")
     def run_prediction_model(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
@@ -42,20 +88,37 @@ class GeneralTasks:
         tuner = kt.Hyperband(
             build_model,
             objective='val_mae',
-            max_epochs=1000,
+            max_epochs=2000,
             directory='tuner_dense',
             project_name='dense_model_test'
         )
-
         tuner.search(X_train, y_train, validation_data=(X_test, y_test), batch_size=32)
 
         best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
         print(f"Best Hyperparameters: {best_hps.values}")
 
         nn = NeuralNetwork(X_train, X_test, y_train, y_test)
-        nn.d_model(hp=best_hps)
+        nn(hp=best_hps)
         nn.train(epochs=1000)
         nn.evaluate()
+
+    def Test_best_model(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
+        X_train, X_test, y_train, y_test = p.load_and_prepare_data(csv_path)
+
+        nn = NeuralNetwork(X_train, X_test, y_train, y_test)
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        model_path = os.path.join(script_dir, "..", "models", "The_Goat_Model.keras")
+        nn.model = load_model(model_path , custom_objects={"r2_metric": r2_metric})
+
+        nn.model.compile(
+            optimizer='adam',
+            loss='mean_squared_error',
+            metrics=['mae', r2_metric]
+        )
+        nn.train(epochs=1000)
+        nn.evaluate()    
     
     def run_cluster_simulation(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -137,7 +200,7 @@ class NeuralNetwork:
         self.model = Sequential()
         
         # First hidden layer (tuned or default units)
-        units = hp.Int('units', min_value=32, max_value=256, step=32) if hp else 64
+        units = hp.Int('units', min_value=32, max_value=1024, step=32) if hp else 64
         self.model.add(Dense(units=units, activation='relu'))
         
         self.model.add(Dense(32, activation='relu'))  # You can also make this tunable if you want
@@ -178,12 +241,16 @@ class NeuralNetwork:
 
         self.model.compile(optimizer='adam', loss='mean_squared_error', metrics=['mae', r2_metric])    
 
+    def z_model(self,hp=None):
+        self.model = build_model2(hp)
 
 
     def train(self, epochs=50, batch_size=32):
-        self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=epochs, batch_size=batch_size)
+        helper = viz.VisualizeData()
+        hist = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=epochs, batch_size=batch_size)
         self.model.save("T.keras")
         print("Model saved as 'T.h5'")
+        helper.evaluate_prediction_model(hist)
 
     def evaluate(self):
         loss, mae, r2 = self.model.evaluate(self.X_test, self.y_test)
@@ -192,7 +259,7 @@ class NeuralNetwork:
 
 
 def main():
-    print("Please Choose from the following options:\n1.Train ONLY the prediction model\n2.Train ONLY the clustering model\n3.Train both models.")
+    print("Please Choose from the following options:\n1.Train ONLY the prediction model\n2.Train ONLY the clustering model\n3.Train both models\n4.")
     inp = int(input())
     tool = GeneralTasks()
     if inp == 1:
@@ -200,7 +267,7 @@ def main():
     elif inp == 2:
         tool.run_cluster_simulation()
     elif inp == 3:
-        x=2    
+        tool.Test_best_model()    
 
 if __name__ == "__main__":
     main()
@@ -252,4 +319,19 @@ BestModel2:
 MAE : 0.0642
 R²  : 0.6379
 
-'''    
+BestModel3:
+MAE : 0.0634
+R²  : 0.6391
+
+
+
+'''
+
+'''
+Notes:
+ITs observed that higher max_value allows tuner to find better model.
+Raising Epoch seemed to help aswell.
+
+
+
+'''

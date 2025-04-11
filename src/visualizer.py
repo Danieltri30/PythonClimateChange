@@ -146,7 +146,30 @@ class VisualizeData:
 
         #Run function to vizualze Data
         #plotplacer.cluster_visualization(city_df)
-        print("END OF CLUSTERED DATA ANALYSIS:\n")    
+        print("END OF CLUSTERED DATA ANALYSIS:\n")
+
+    def evaluate_prediction_model(self,history):
+        #Shows MAE through epochs
+        plt.figure()
+        plt.plot(history.history['mae'], label='Train MAE')
+        plt.plot(history.history['val_mae'], label='Validation MAE')
+        plt.xlabel('Epochs')
+        plt.ylabel('MAE')
+        plt.title('MAE over Epochs')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+        # THis shows R^2 through epochs
+        plt.figure()
+        plt.plot(history.history['r2_metric'], label='Train R²')
+        plt.plot(history.history['val_r2_metric'], label='Validation R²')
+        plt.xlabel('Epochs')
+        plt.ylabel('R² Score')
+        plt.title('R² over Epochs')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
 
 def main():
