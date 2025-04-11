@@ -127,17 +127,20 @@ class FineTuneData:
         return temp_orig, co2_orig
     
 
-
+#This class will give synthetic data to our neural network so he can predict future climate
 class SyntheticDataProcessor:
-    def estimate_yearlyco2(self,df):
+    def estimate_monthly_co2_trend(df):
         df["time"] = pd.to_datetime(df["time"])
         df = df.sort_values("time")
 
-        yearly_avg = df.groupby("year")["co2_ppm"].mean().reset_index()
-        yearly_avg["delta"] = yearly_avg["co2_ppm"].diff()
-        avg_increase = yearly_avg["delta"].dropna().mean()
-        print("Estimated average yearly CO₂ increase (ppm):", round(avg_increase, 2))
-        return avg_increase, yearly_avg
+        # Calculate month-to-month change in CO2
+        df["delta_co2"] = df["co2_ppm"].diff()
+
+        # Drop the NaN and compute average monthly increase
+        avg_monthly_increase = df["delta_co2"].dropna().mean()
+        print("Average monthly CO₂ increase (ppm):", round(avg_monthly_increase, 4))
+
+        return avg_monthly_increase
 class DataProcessor:
     #Intialize DataProcessor instance including file path to dataset
     def __init__(self, file_path: str):

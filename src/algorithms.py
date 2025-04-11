@@ -182,7 +182,7 @@ class NeuralNetwork:
 
     def train(self, epochs=50, batch_size=32):
         self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=epochs, batch_size=batch_size)
-        self.model.save("T.h5")
+        self.model.save("T.keras")
         print("Model saved as 'T.h5'")
 
     def evaluate(self):
@@ -247,5 +247,9 @@ R²  : 0.6327
 NewBestModel:
 MAE : 0.0637
 R²  : 0.6350
+
+BestModel2:
+MAE : 0.0642
+R²  : 0.6379
 
 '''    
