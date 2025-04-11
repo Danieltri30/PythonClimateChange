@@ -10,13 +10,15 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import numpy as np
 import data_processor as pros
-import algorithms as algo
+import algorithmsgui as algo
 import visualizergui as viz
 from threading import Thread , Lock
 from flask import redirect, url_for
 ###
 
 app = Flask(__name__, template_folder='templates')
+atool = algo.GeneralTasks()
+
 
 def get_plot_base64():
     """Convert matplotlib plot to base64 string"""
@@ -37,7 +39,6 @@ training_lock = Lock()
 def train_prediction():
     def background_train():
         try:
-            atool = algo.GeneralTasks()
             results = atool.run_prediction_model_for_gui()
             with training_lock:
                 training_results['results'] = results
@@ -64,55 +65,59 @@ def training_status():
 @app.route('/train-clustering')
 def train_clustering():
     try:
-        # Read the CSV file
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
-        df = pd.read_csv(csv_path)
-        
-        # Prepare data for clustering
-        X = df[['temperature', 'co2_ppm']].values
-        
-        # Train clustering model
-        clustering = Clustering()
-        results = clustering.cluster_data(X)
-        
-        return render_template('training_results.html',
-                             model_type='Clustering',
-                             results=results)
+        atool = algo.GeneralTasks()
+        results = atool.run_cluster_simulation_gui()
+        return render_template('clustering.html',
+                               model_type='Clustering',
+                               **results)
     except Exception as e:
         return f"An error occurred: {str(e)}", 500
+
+best_training_results = {}
+best_training_lock = Lock()
+@app.route('/gauge-model')
+def train_best_prediction():
+    def besttrain():
+        try:
+            results = atool.run_best_prediction_model_for_gui()
+            with best_training_lock:
+                best_training_results['results'] = results
+        except Exception as e:
+            with best_training_lock:
+                best_training_results['results'] = {'error': str(e)}
+    Thread(target=besttrain).start()
+
+    # Redirect immediately while training happens in background
+    return redirect(url_for('best_training_status'))
+
+@app.route('/beststatus')
+def best_training_status():
+    with best_training_lock:
+        if 'results' in best_training_results:
+            res = best_training_results.pop('results')  # clear for next run
+            if 'error' in res:
+                return f"An error occurred: {res['error']}", 500
+            return render_template('best.html', **res)
+    return render_template('best.html')
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 '''
-@app.route('/gauge-model')
-def gauge_model():
-    try:
-        # Read the CSV file
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
-        df = pd.read_csv(csv_path)
-        
-        # Prepare data for evaluation
-        X = df[['temperature', 'co2_ppm']].values
-        y = df['temperature'].shift(-1).dropna().values
-        X = X[:-1]
-        
-        # Split data
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-        
-        # Evaluate models
-        prediction_model = Predictions(X_train, X_test, y_train, y_test)
-        prediction_model.build_model()
-        prediction_results = prediction_model.evaluate()
-        
-        clustering = Clustering()
-        clustering_results = clustering.cluster_data(X)
-        
-        return render_template('model_evaluation.html',
-                             prediction_results=prediction_results,
-                             clustering_results=clustering_results)
-    except Exception as e:
-        return f"An error occurred: {str(e)}", 500
-
 @app.route('/predict-future')
 def predict_future():
     try:
@@ -135,7 +140,7 @@ def predict_future():
     except Exception as e:
         return f"An error occurred: {str(e)}", 500
 '''
-
+'''
 @app.route('/visualize')
 def visualize():
     try:
@@ -211,6 +216,7 @@ def visualize():
         return render_template('visualize.html', plots=plots)
     except Exception as e:
         return f"An error occurred: {str(e)}", 500
+'''
 
 if __name__ == '__main__':
     app.run(debug=True) 

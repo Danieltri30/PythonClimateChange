@@ -3,80 +3,70 @@
 {% block title %}Home - Climate Change Analysis{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="hero-section text-center py-5 mb-5">
-    <h1 class="display-4 fw-bold">Climate Change Analysis</h1>
-    <p class="lead">Understanding global climate patterns and their impact on our planet</p>
-</div>
+<div class="container">
+    <div class="text-center my-5">
+        <h1 class="display-4">Climate Change Analysis</h1>
+        <p class="lead">Select an analysis option to proceed</p>
+    </div>
 
-<!-- Data Cards Section -->
-<div class="row g-4">
-    <!-- Temperature Trends Card -->
-    <div class="col-md-6">
-        <div class="card h-100 shadow">
-            <div class="card-header bg-primary text-white">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-thermometer-half me-2"></i>Temperature Trends
-                </h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">Analyze global temperature changes over time and their correlation with climate events.</p>
-                <div class="chart-container" style="height: 300px;">
-                    <!-- Chart will be rendered here -->
+    <div class="row g-4">
+        <!-- Option 1: Train Prediction Model -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h2 class="card-title">1. Train Prediction Model</h2>
+                    <p class="card-text">Train the prediction model to forecast future climate patterns based on historical data.</p>
+                    <a href="/train-prediction" class="btn btn-primary">Start Training</a>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- CO2 Emissions Card -->
-    <div class="col-md-6">
-        <div class="card h-100 shadow">
-            <div class="card-header bg-success text-white">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-industry me-2"></i>CO2 Emissions
-                </h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">Track carbon dioxide emissions and their impact on global warming.</p>
-                <div class="chart-container" style="height: 300px;">
-                    <!-- Chart will be rendered here -->
+        <!-- Option 2: Train Clustering Model -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h2 class="card-title">2. Train Clustering Model</h2>
+                    <p class="card-text">Train and evaluate the clustering model to identify patterns in climate data.</p>
+                    <a href="/train-clustering" class="btn btn-primary">Start Training</a>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Sea Level Rise Card -->
-    <div class="col-md-6">
-        <div class="card h-100 shadow">
-            <div class="card-header bg-info text-white">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-water me-2"></i>Sea Level Rise
-                </h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">Monitor changes in sea levels and their implications for coastal regions.</p>
-                <div class="chart-container" style="height: 300px;">
-                    <!-- Chart will be rendered here -->
+        <!-- Option 3: Gauge Best Model -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h2 class="card-title">3. Gauge Best Model</h2>
+                    <p class="card-text">Evaluate and compare the performance of our trained models.</p>
+                    <a href="/gauge-model" class="btn btn-primary">Evaluate Models</a>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Extreme Weather Events Card -->
-    <div class="col-md-6">
-        <div class="card h-100 shadow">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-exclamation-triangle me-2"></i>Extreme Weather Events
-                </h5>
-            </div>
-            <div class="card-body">
-                <p class="card-text">Analyze the frequency and intensity of extreme weather events worldwide.</p>
-                <div class="chart-container" style="height: 300px;">
-                    <!-- Chart will be rendered here -->
+        <!-- Option 4: Predict Future -->
+        <div class="col-md-6">
+            <div class="card h-100 shadow">
+                <div class="card-body">
+                    <h2 class="card-title">4. Predict Future Climate</h2>
+                    <p class="card-text">Use our best model to predict future climate change scenarios.</p>
+                    <a href="/predict-future" class="btn btn-primary">Make Predictions</a>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.card {
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.btn {
+    margin-top: 1rem;
+}
+</style>
 {% endblock %}

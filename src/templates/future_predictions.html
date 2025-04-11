@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Future Predictions - Climate Change Analysis{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center my-4">
+        <h1>Future Climate Predictions</h1>
+        <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Predicted Climate Changes</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Time Period</th>
+                            <th>Predicted Temperature Change (°C)</th>
+                            <th>Predicted CO2 Level (ppm)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prediction in predictions %}
+                        <tr>
+                            <td>{{ loop.index }} year{{ 's' if loop.index > 1 }}</td>
+                            <td>{{ prediction[0]|round(2) }}</td>
+                            <td>{{ prediction[1]|round(2) }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Visualization</h2>
+            <div id="prediction-plot" style="height: 500px;"></div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Interpretation</h2>
+            <p>These predictions are based on our best-performing model and historical climate data. Please note that these are projections and actual future climate conditions may vary based on various factors including:</p>
+            <ul class="list-group">
+                <li class="list-group-item">Human intervention and policy changes</li>
+                <li class="list-group-item">Natural climate variability</li>
+                <li class="list-group-item">Technological advancements</li>
+                <li class="list-group-item">Global economic factors</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+// Plotly visualization code will be added here
+</script>
+{% endblock %} 

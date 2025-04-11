@@ -19,6 +19,7 @@ from tensorflow.keras.layers import Dropout
 import data_processor as p
 import matplotlib.pyplot as plt
 import visualizer as viz
+import visualizergui as thatguy
 ###
 
 #Custom r^2 I used in a previous project 
@@ -134,6 +135,37 @@ class GeneralTasks:
 
         results = nn.train_for_gui(epochs=1000)
         return results
+    
+
+    def run_best_prediction_model_for_gui(self):
+        results = self.Test_best_model_gui()
+        return results
+    
+    def Test_best_model_gui(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
+        X_train, X_test, y_train, y_test = p.load_and_prepare_data(csv_path)
+
+        nn = NeuralNetwork(X_train, X_test, y_train, y_test)
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        model_path = os.path.join(script_dir, "..", "models", "The_Goat_Model.keras")
+        nn.model = load_model(model_path , custom_objects={"r2_metric": r2_metric})
+
+        nn.model.compile(
+            optimizer='adam',
+            loss='mean_squared_error',
+            metrics=['mae', r2_metric]
+        )
+        results = nn.train_for_gui(epochs=1000)
+        return results
+
+
+
+
+
+
+
+
 
     def Test_best_model(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -194,6 +226,7 @@ class GeneralTasks:
         script_dir = os.path.dirname(os.path.abspath(__file__))
         csv_path = os.path.join(script_dir, "..", "data", "CleanedGlobalLandTemp.csv")
         cluster_df = pd.read_csv(csv_path)
+        print(cluster_df.columns)
 
         # Scale the data
         datautil = p.FineTuneClusterData()
@@ -326,7 +359,7 @@ class NeuralNetwork:
         helper.evaluate_prediction_model(hist)
         
     def train_for_gui(self, epochs=50, batch_size=32):
-        helper = viz.VisualizeData()
+        helper = thatguy.VisualizeData()
         hist = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=epochs, batch_size=batch_size)
         self.model.save("T.keras")
         print("Model saved as 'T.h5'")

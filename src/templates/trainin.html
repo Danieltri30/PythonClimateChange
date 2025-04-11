@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Training Status</title>
+    {% if not mae %}
+        <meta http-equiv="refresh" content="5"> <!-- auto-refresh if still training -->
+    {% endif %}
+</head>
+<body>
+    {% if mae %}
+        <h1>Training Complete!</h1>
+        <p><strong>MAE:</strong> {{ mae }}</p>
+        <p><strong>R² Score:</strong> {{ r2 }}</p>
+
+        <h2>Training Plots</h2>
+        <h3>MAE Over Time</h3>
+        <img src="data:image/png;base64,{{ mae_plot }}" alt="MAE Plot">
+        
+        <h3>R² Score Over Time</h3>
+        <img src="data:image/png;base64,{{ r2_plot }}" alt="R² Plot">
+    {% else %}
+        <h1>Training the model... please wait!</h1>
+    {% endif %}
+</body>
+</html>

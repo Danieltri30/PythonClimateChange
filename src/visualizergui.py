@@ -136,13 +136,35 @@ class VisualizeData:
         plt.colorbar(label='Cluster')
         plt.show()
 
+    def cluster_visualization_for_gui(self,df,s):
+        plt.figure()
+        print(df.columns)
+        plt.scatter(df['Longitude'], df['Latitude'], c=df['Cluster'], cmap='tab10', s=10)
+        plt.title(f"City Clusters based on Temp + Coordinates ({s})")
+        plt.xlabel("Longitude")
+        plt.ylabel("Latitude")
+        plt.grid(True)
+        buf = BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        result = base64.b64encode(buf.getvalue()).decode('utf-8')
+        plt.close()
+        return result  
+
     #Proves that our choice of k was perfect mathematically
-    def showelbow(self,klist):         
-        plt.plot(range(1, 11), klist, marker='o')
-        plt.xlabel('Number of Clusters')
-        plt.ylabel('Inertia')
+    def showelbow_for_gui(self,distortions):         
+        plt.figure()
+        plt.plot(range(1, len(distortions)+1), distortions, marker='o')
         plt.title('Elbow Method For Optimal k')
-        plt.show()
+        plt.xlabel('Number of clusters (k)')
+        plt.ylabel('Distortion')
+        plt.grid(True)
+        buf = BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        result = base64.b64encode(buf.getvalue()).decode('utf-8')
+        plt.close()
+        return result
 
     #Functions to keep code clean
     def general_data_analysis(self,df):
