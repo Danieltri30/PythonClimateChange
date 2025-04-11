@@ -5,6 +5,7 @@
 #pip install joblib
 
 import matplotlib
+matplotlib.use('Agg')
 import joblib
 from sklearn.preprocessing import MinMaxScaler
 import datetime

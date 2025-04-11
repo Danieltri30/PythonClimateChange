@@ -19,7 +19,7 @@ from tensorflow.keras.layers import Dropout
 import data_processor as p
 import visualizer as viz
 import matplotlib.pyplot as plt
-
+###
 
 #Custom r^2 I used in a previous project 
 def r2_metric(y_true, y_pred):
@@ -110,6 +110,30 @@ class GeneralTasks:
         nn.d_model(hp=best_hps)
         nn.train(epochs=1000)
         nn.evaluate()
+    
+    def run_prediction_model_for_gui(self):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
+        X_train, X_test, y_train, y_test = p.load_and_prepare_data(csv_path)
+
+        tuner = kt.Hyperband(
+            build_model,
+            objective='val_mae',
+            max_epochs=2000,
+            directory='tuner_dense',
+            project_name='dense_model_test'
+        )
+        tuner.search(X_train, y_train, validation_data=(X_test, y_test), batch_size=32)
+
+        best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
+        print(f"Best Hyperparameters: {best_hps.values}")
+
+        nn = NeuralNetwork(X_train, X_test, y_train, y_test)
+        nn.d_model(hp=best_hps)
+
+
+        results = nn.train_for_gui(epochs=1000)
+        return results
 
     def Test_best_model(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -127,8 +151,8 @@ class GeneralTasks:
             metrics=['mae', r2_metric]
         )
         nn.train(epochs=1000)
-        nn.evaluate()    
-    
+        nn.evaluate()
+
     def run_cluster_simulation(self):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         csv_path = os.path.join(script_dir, "..", "data", "CleanedGlobalLandTemp.csv")
@@ -260,6 +284,19 @@ class NeuralNetwork:
         self.model.save("T.keras")
         print("Model saved as 'T.h5'")
         helper.evaluate_prediction_model(hist)
+        
+    def train_for_gui(self, epochs=50, batch_size=32):
+        helper = viz.VisualizeData()
+        hist = self.model.fit(self.X_train, self.y_train, validation_data=(self.X_test, self.y_test), epochs=epochs, batch_size=batch_size)
+        self.model.save("T.keras")
+        print("Model saved as 'T.h5'")
+        plots = helper.evaluate_prediction_model_for_gui(hist)
+        return {
+        "mae": hist.history['val_mae'][-1],
+        "r2": hist.history['val_r2_metric'][-1],
+        "mae_plot": plots['mae_plot'],
+        "r2_plot": plots['r2_plot']
+        }    
 
     def evaluate(self):
         loss, mae, r2 = self.model.evaluate(self.X_test, self.y_test)
