@@ -3,70 +3,97 @@
 {% block title %}Model Evaluation - Climate Change Analysis{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="text-center my-4">
-        <h1>Model Evaluation Results</h1>
-        <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center mb-5">
+        <h1 class="display-4 mb-4" style="color: var(--secondary-color);">
+            <i class="fas fa-balance-scale weather-icon"></i>
+            Model Evaluation
+        </h1>
+        <p class="lead" style="color: var(--text-muted);">
+            Comparing Model Performance
+        </p>
     </div>
+</div>
 
-    <!-- Prediction Model Results -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Prediction Model Performance</h2>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Metric</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for metric, value in prediction_results.items() %}
-                        <tr>
-                            <td>{{ metric }}</td>
-                            <td>{{ value }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-chart-line weather-icon"></i>
+                    Prediction Model Performance
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for metric, value in prediction_results.items() %}
+                            <tr>
+                                <td>{{ metric }}</td>
+                                <td>{{ "%.4f"|format(value) if value is number else value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="plot-container">
+                    {{ prediction_plot|safe }}
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Clustering Model Results -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Clustering Model Performance</h2>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Metric</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for metric, value in clustering_results.items() %}
-                        <tr>
-                            <td>{{ metric }}</td>
-                            <td>{{ value }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-project-diagram weather-icon"></i>
+                    Clustering Model Performance
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for metric, value in clustering_results.items() %}
+                            <tr>
+                                <td>{{ metric }}</td>
+                                <td>{{ "%.4f"|format(value) if value is number else value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="plot-container">
+                    {{ cluster_plot|safe }}
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Next Steps</h2>
-            <ul class="list-group">
-                <li class="list-group-item">1. Review the model performance metrics above</li>
-                <li class="list-group-item">2. <a href="/predict-future">Make predictions with the best model</a></li>
-                <li class="list-group-item">3. <a href="/visualize">View data visualizations</a></li>
-            </ul>
+        <div class="next-steps">
+            <h3>
+                <i class="fas fa-arrow-right weather-icon"></i>
+                Next Steps
+            </h3>
+            <div class="d-grid gap-2">
+                <a href="/predict-future" class="btn btn-primary">
+                    <i class="fas fa-crystal-ball me-2"></i>Make Predictions
+                </a>
+                <a href="/visualize" class="btn btn-primary">
+                    <i class="fas fa-chart-bar me-2"></i>View Data Visualizations
+                </a>
+            </div>
         </div>
     </div>
 </div>
