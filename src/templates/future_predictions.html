@@ -3,60 +3,98 @@
 {% block title %}Future Predictions - Climate Change Analysis{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="text-center my-4">
-        <h1>Future Climate Predictions</h1>
-        <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
-    </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Predicted Climate Changes</h2>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Time Period</th>
-                            <th>Predicted Temperature Change (°C)</th>
-                            <th>Predicted CO2 Level (ppm)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for prediction in predictions %}
-                        <tr>
-                            <td>{{ loop.index }} year{{ 's' if loop.index > 1 }}</td>
-                            <td>{{ prediction[0]|round(2) }}</td>
-                            <td>{{ prediction[1]|round(2) }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Visualization</h2>
-            <div id="prediction-plot" style="height: 500px;"></div>
-        </div>
-    </div>
-
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Interpretation</h2>
-            <p>These predictions are based on our best-performing model and historical climate data. Please note that these are projections and actual future climate conditions may vary based on various factors including:</p>
-            <ul class="list-group">
-                <li class="list-group-item">Human intervention and policy changes</li>
-                <li class="list-group-item">Natural climate variability</li>
-                <li class="list-group-item">Technological advancements</li>
-                <li class="list-group-item">Global economic factors</li>
-            </ul>
-        </div>
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center mb-5">
+        <h1 class="display-4 mb-4" style="color: var(--secondary-color);">
+            <i class="fas fa-crystal-ball weather-icon"></i>
+            Future Climate Predictions
+        </h1>
+        <p class="lead" style="color: var(--text-muted);">
+            Projected Climate Changes for the Next Decade
+        </p>
     </div>
 </div>
 
-<script>
-// Plotly visualization code will be added here
-</script>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-chart-line weather-icon"></i>
+                    Predicted Climate Changes
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Predicted Temperature Change (°C)</th>
+                                <th>Predicted CO2 Levels (ppm)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i, pred in enumerate(predictions) %}
+                            <tr>
+                                <td>{{ i + 1 }}</td>
+                                <td>{{ "%.2f"|format(pred[0]) }}</td>
+                                <td>{{ "%.2f"|format(pred[1]) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-chart-area weather-icon"></i>
+                    Prediction Visualization
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="plot-container">
+                    {{ prediction_plot|safe }}
+                </div>
+            </div>
+        </div>
+
+        <div class="interpretation">
+            <h3>
+                <i class="fas fa-lightbulb weather-icon"></i>
+                Interpretation
+            </h3>
+            <p style="color: var(--text-muted);">
+                These predictions are based on historical climate data and current trends. The model takes into account:
+            </p>
+            <ul style="color: var(--text-muted);">
+                <li>Historical temperature and CO2 correlations</li>
+                <li>Recent climate change patterns</li>
+                <li>Current environmental conditions</li>
+            </ul>
+            <p style="color: var(--text-muted);">
+                Note: These are projections based on current trends and do not account for potential human intervention,
+                natural variability, or unforeseen environmental changes.
+            </p>
+        </div>
+
+        <div class="next-steps">
+            <h3>
+                <i class="fas fa-arrow-right weather-icon"></i>
+                Next Steps
+            </h3>
+            <div class="d-grid gap-2">
+                <a href="/visualize" class="btn btn-primary">
+                    <i class="fas fa-chart-bar me-2"></i>View Historical Data
+                </a>
+                <a href="/gauge-model" class="btn btn-primary">
+                    <i class="fas fa-balance-scale me-2"></i>Compare Model Performance
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %} 
