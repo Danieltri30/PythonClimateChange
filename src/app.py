@@ -117,5 +117,17 @@ def predict_future():
         return f"An error occurred: {str(e)}", 500
 
 
+@app.route('/visualize')
+def visualize():
+    try:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(script_dir, "..", "data", "FinalProcessedData.csv")
+        final_df = pd.read_csv(csv_path)
+        visualizations = vtool.general_data_analysis_for_gui(final_df)
+        return render_template('visualize.html',**visualizations)  # Replace 'visualize.html' with your actual template name
+    except Exception as e:
+        return f"An error occurred: {str(e)}", 500
+    
+
 if __name__ == '__main__':
     app.run(debug=True) 

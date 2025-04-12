@@ -55,6 +55,33 @@ class VisualizeData:
         
         plt.show()
 
+
+    def co2_over_time_for_gui(self,df: pd.DataFrame):
+        plt.figure(figsize=[10, 6])
+        subdf = df
+        new = set()
+        for val in subdf["time"]:
+            temp = val[:4]
+            new.add(temp)
+        sset = sorted(new)        
+        plt.plot(df['time'], df['co2_ppm'], color='red', label='CO2 Levels (ppm)')
+        min_year = 0
+        max_year = 2000
+        xticks = range(min_year, max_year + 1, 1000)
+        plt.xticks(xticks, rotation=45)
+        plt.title('CO2 PPM Level Over Time')
+        plt.xlabel('Time (Every 50 Years)')
+        plt.ylabel('CO2 Levels (ppm)')
+        plt.grid(True)
+        plt.legend()
+        plt.tight_layout()
+        buf = BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        plt.close()
+        return img_base64
+
     #Shows Temperature Deviation over time
     #Temperature deviation refers to sudden alterations of temperature vs the average for a chosen period of time
     def temperature_levels_over_time(self,df:pd.DataFrame):
@@ -88,6 +115,47 @@ class VisualizeData:
         plt.tight_layout()  
         
         plt.show()
+
+   #Shows Temperature Deviation over time
+    #Temperature deviation refers to sudden alterations of temperature vs the average for a chosen period of time
+    def temperature_levels_over_time_for_gui(self,df:pd.DataFrame):
+        plt.figure(figsize=[10, 6])
+
+        subdf = df
+        new = set()
+        for val in subdf["time"]:
+            temp = val[:4]
+            new.add(temp)
+
+        sset = sorted(new)        
+        plt.plot(df['time'], df['temperature'], color='red', label='Temperature Deviation Levels')
+
+        min_year = 0
+        max_year = 2000
+
+        xticks = range(min_year, max_year + 1, 1000)
+        plt.xticks(xticks, rotation=45)
+
+        plt.title('Temperature Deviations over time')
+        plt.xlabel('Time (Every 50 Years)')
+        plt.ylabel('Temperature')
+
+        plt.grid(True)
+        plt.legend()
+        plt.tight_layout()
+
+        
+        buf = BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+
+        
+        img_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+
+        
+        plt.close()
+
+        return img_base64   
 
     def predicted_temperature_levels_over_time(self,df:pd.DataFrame):
         plt.figure(figsize=[10, 6])
@@ -157,6 +225,19 @@ class VisualizeData:
         plt.ylabel('CO2 Level (ppm)')
         plt.show()
 
+    def co2_vs_Temperature_for_gui(self,df:pd.DataFrame):
+        plt.figure(4)
+        plt.scatter(df['temperature'], df['co2_ppm'], alpha=0.5)
+        plt.title('CO2 Level vs Temperature')
+        plt.xlabel('Temperature Deviation')
+        plt.ylabel('CO2 Level (ppm)')
+        buf = BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+        plt.close()
+        return img_base64
+
     #Generalized function to show cluster visuals
     #Robust and accepts various clustering algorithms
     def cluster_visualization(self,df,s):
@@ -219,6 +300,20 @@ class VisualizeData:
         #THis will show temperature levels over time
         plotplacer.temperature_levels_over_time(final_df)
         print("END OF GENERAL DATA ANALYSIS:\n")
+
+    def general_data_analysis_for_gui(self,df):
+        plotplacer = VisualizeData()
+
+        co2_vs_temp_img = plotplacer.co2_vs_Temperature_for_gui(df)
+        co2_over_time_img = plotplacer.co2_over_time_for_gui(df)
+        temp_over_time_img = plotplacer.temperature_levels_over_time_for_gui(df)
+
+        return {
+            "co2_vs_temp_plot": co2_vs_temp_img,
+            "co2_over_time_plot": co2_over_time_img,
+            "temp_over_time_plot": temp_over_time_img
+        }
+           
 
     def oldClustercode():
         #Unused since we added a better version of this in algorithms
@@ -289,6 +384,7 @@ class VisualizeData:
         plt.close()
 
         return plots
+    
     
 
 

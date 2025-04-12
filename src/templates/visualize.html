@@ -1,33 +1,25 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizations</title>
+</head>
+<body>
+    <h1>Visualization Results</h1>
 
-{% block title %}Data Visualization - Climate Change Analysis{% endblock %}
+    <!-- Display CO2 vs Temperature plot -->
+    <h2>CO2 vs Temperature</h2>
+    <img src="data:image/png;base64,{{ co2_vs_temp_plot }}" alt="CO2 vs Temperature Plot" />
 
-{% block content %}
-<div class="container">
-    <h1 class="text-center my-4">Climate Data Visualization</h1>
-    
-    <!-- Temperature Plot -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Global Temperature Over Time</h2>
-            <img src="data:image/png;base64,{{ plots.temperature }}" class="img-fluid" alt="Temperature Plot">
-        </div>
-    </div>
-    
-    <!-- CO2 Plot -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">CO2 Levels Over Time</h2>
-            <img src="data:image/png;base64,{{ plots.co2 }}" class="img-fluid" alt="CO2 Plot">
-        </div>
-    </div>
-    
-    <!-- Correlation Heatmap -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Correlation Heatmap</h2>
-            <img src="data:image/png;base64,{{ plots.heatmap }}" class="img-fluid" alt="Correlation Heatmap">
-        </div>
-    </div>
-</div>
-{% endblock %} 
+    <!-- Display CO2 over time plot -->
+    <h2>CO2 Over Time</h2>
+    <img src="data:image/png;base64,{{ co2_over_time_plot }}" alt="CO2 Over Time Plot" />
+
+    <!-- Display Temperature over time plot -->
+    <h2>Temperature Over Time</h2>
+    <img src="data:image/png;base64,{{ temp_over_time_plot }}" alt="Temperature Over Time Plot" />
+
+    <a href="/" class="btn btn-secondary">Back to Home</a>
+</body>
+</html>
