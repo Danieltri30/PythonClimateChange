@@ -1,0 +1,14 @@
+auto_mix_prep==0.2.0
+Flask==3.1.0
+joblib==1.4.2
+keras_tuner==1.4.7
+matplotlib==3.10.1
+netCDF4==1.7.2
+netCDF4==1.7.2
+numpy==2.2.4
+pandas==2.2.3
+plotly==6.0.1
+scikit_learn==1.6.1
+seaborn==0.13.2
+tensorflow==2.18.0
+xarray==2025.3.1
