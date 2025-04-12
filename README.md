@@ -54,12 +54,12 @@ Our Climate Change project
 ## Building Flask Application for Development:
 #### Step 1: Enter the src directory.
 ```
- cd src
+MAKE SURE YOU ARE IN THE DEFAULT DIRECTORY
 ```
 
 #### Step 2:
 ```
-flask --app main.py run
+PYTHONPATH=src flask --app main.py run
 ```
 
 #### In your terminal you should see something like this:
