@@ -1,8 +1,12 @@
+import sys
+import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 import unittest
 import numpy as np
 from unittest.mock import MagicMock, patch
-import src.algorithms as alg
-from src.algorithms import NeuralNetwork
+import algorithms as alg
+from algorithms import NeuralNetwork
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 
