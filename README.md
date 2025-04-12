@@ -19,48 +19,73 @@ Our Climate Change project
 ## climate_analyzer_project Structure 
 #### (Placeholder - Will update when we get closer to turn-in time)
 * `.venv`: Virtual Enviroment
-* `data/`: Climate data (CSV/JSON format)
+* `data/`: Climate data (CSV format)
+* `models` : Holds multiple variations of the models we trained and saved 
 * `src/`: Source code & Flask Files
     * `__pycache__`: ***Ignore it*** - Stores compiled bytecode
     * `static`: **Flask** - Holds CSS & Javascript files
         * `css`: 
         * `js`:
     * `templates`: **Flask** - Holds HTML Files
-* `Term_Project_Instructions`: Has instructions from Canvas.
 * `tests/`: Unit tests
+*  `tuner_dense`: Holds learning trials from algorithm tuner
 * `README.md`: Project documentation
 * `requirements.txt`: Project dependencies
+* ResearchPaper19.pdf : our research report
 
 ## Project features
-- XXX
-- XXX
-- XXX
+- Future climate prediction
+- GUI using Flask
+- Operational from backend if needbe
+- CLustering performance visualization
+- Neural Network performance vizualization
 
 
 # Installation & Dependencies
 
-## Activate the environment
-#### (Placeholder - Work in progress)
+## Create Virtual Enviorment
 
 ### Windows:
 ```
-.venv\Scripts\activate
+    python -m venv .venv
+    venv\Scripts\activate
 ```
 
 ### Linux/MacOS:
 ```
-. .venv/bin/activate
+python3 -m venv .venv (Note if python3 does not work attempt to use python)
+source .venv/bin/activate
 ```
 ## Building Flask Application for Development:
 #### Step 1: Enter the src directory.
 ```
-MAKE SURE YOU ARE IN THE DEFAULT DIRECTORY
+MAKE SURE YOU ARE IN THE DEFAULT DIRECTORY(Root):  'PYTHONCLIMATECHANGE'
 ```
 
-#### Step 2:
+#### Step 2: Install Dependencies
+
+```
+pip install -r requirements.txt
+```
+
+
+#### Step 3 :
+
+```
+Make sure you are in the top level of the
+project directory: "PythonClimateChange"
+
+```
+
+
+
+#### Step 4: Run this to run our interactive gui and see the features of our project
 ```
 PYTHONPATH=src flask --app main.py run
 ```
+### Note we did not have enough time to add a return to main menu feature for each button,
+### Simply press the back arrow to return to main menu on your browser
+
 
 #### In your terminal you should see something like this:
 ```
@@ -70,7 +95,7 @@ PYTHONPATH=src flask --app main.py run
 WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
  * Running on http://127.0.0.1:5000
 ```
-#### Step 3: Copy and Paste the into your preferred web browser the IP address that shows up in your terminal.
+#### Step 5: Copy and Paste the into your preferred web browser the IP address that shows up in your terminal.
 ```
 http://127.0.0.1:5000
 ```
