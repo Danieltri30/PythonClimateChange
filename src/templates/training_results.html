@@ -3,46 +3,81 @@
 {% block title %}Training Results - Climate Change Analysis{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="text-center my-4">
-        <h1>{{ model_type }} Model Training Results</h1>
-        <a href="/" class="btn btn-secondary mt-3">Back to Home</a>
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center mb-5">
+        <h1 class="display-4 mb-4" style="color: var(--secondary-color);">
+            <i class="fas fa-chart-line weather-icon"></i>
+            Training Results
+        </h1>
+        <p class="lead" style="color: var(--text-muted);">
+            {{ model_type }} Model Performance Metrics
+        </p>
     </div>
+</div>
 
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Training Metrics</h2>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Metric</th>
-                            <th>Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for metric, value in results.items() %}
-                        <tr>
-                            <td>{{ metric }}</td>
-                            <td>{{ value }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                    <img src="data:image/png;base64,{{ results['mae_plot'] }}" class="img-fluid">
-                    <img src="data:image/png;base64,{{ results['r2_plot'] }}" class="img-fluid">
-                </table>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-tachometer-alt weather-icon"></i>
+                    Training Metrics
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for metric, value in results.items() %}
+                            <tr>
+                                <td>{{ metric }}</td>
+                                <td>{{ "%.4f"|format(value) if value is number else value }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h2 class="card-title">Next Steps</h2>
-            <ul class="list-group">
-                <li class="list-group-item">1. Review the training metrics above</li>
-                <li class="list-group-item">2. <a href="/gauge-model">Compare with other models</a></li>
-                <li class="list-group-item">3. <a href="/predict-future">Make predictions with this model</a></li>
-            </ul>
+        {% if cluster_plot %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="mb-0">
+                    <i class="fas fa-project-diagram weather-icon"></i>
+                    Cluster Visualization
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="plot-container">
+                    {{ cluster_plot|safe }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="next-steps">
+            <h3>
+                <i class="fas fa-arrow-right weather-icon"></i>
+                Next Steps
+            </h3>
+            <div class="d-grid gap-2">
+                <a href="/gauge-model" class="btn btn-primary">
+                    <i class="fas fa-balance-scale me-2"></i>Compare with Other Models
+                </a>
+                <a href="/predict-future" class="btn btn-primary">
+                    <i class="fas fa-crystal-ball me-2"></i>Make Predictions
+                </a>
+                <a href="/visualize" class="btn btn-primary">
+                    <i class="fas fa-chart-bar me-2"></i>View Data Visualizations
+                </a>
+            </div>
         </div>
     </div>
 </div>
