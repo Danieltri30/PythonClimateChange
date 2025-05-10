@@ -45,6 +45,8 @@ Our Climate Change project
 
 ## Create Virtual Enviorment
 
+## Note that these steps may not work on windows, will fix this issue soon. Be assured that the MAC/Linux Operating System will run the website correctly.
+
 ### Windows:
 ```
     python -m venv .venv
